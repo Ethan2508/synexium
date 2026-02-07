@@ -51,6 +51,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Mettre à jour les metadata avec le rôle pour le middleware
+    await supabase.auth.updateUser({
+      data: { role: dbUser.role, status: dbUser.status },
+    });
+
     return NextResponse.json({
       success: true,
       user: dbUser,

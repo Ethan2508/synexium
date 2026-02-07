@@ -43,8 +43,13 @@ export async function middleware(request: NextRequest) {
       url.searchParams.set("redirect", pathname);
       return NextResponse.redirect(url);
     }
-    // On vérifie le rôle admin via un header custom
-    // La vérification réelle se fait côté API/page via Prisma
+    // Vérifier le rôle admin depuis les metadata
+    const userRole = user.user_metadata?.role;
+    if (userRole !== "ADMIN") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
   }
 
   // ──────── Protection /compte ────────

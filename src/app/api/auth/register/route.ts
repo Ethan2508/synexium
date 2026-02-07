@@ -89,6 +89,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Mettre à jour les metadata Supabase avec le rôle et status
+    await supabase.auth.updateUser({
+      data: { role: user.role, status: user.status },
+    });
+
     return NextResponse.json({
       success: true,
       message: "Compte créé. Votre demande est en attente de validation par notre équipe.",
