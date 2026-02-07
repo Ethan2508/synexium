@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  /* ===== Couleurs Francilienne Energy ===== */
+  --color-primary: #283084;
+  --color-primary-dark: #1e2460;
+  --color-primary-light: #3a4296;
+
+  --color-solar-green: #7fb727;
+  --color-solar-yellow: #eea400;
+  --color-heatpump-red: #e6332a;
+  --color-climate-blue: #009fe3;
+
+  --color-surface: #f8f9fc;
+  --color-surface-dark: #eef0f6;
+  --color-border: #e2e5f0;
+  --color-text-primary: #1a1a2e;
+  --color-text-secondary: #6b7194;
+
+  /* ===== Fonts ===== */
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+/* ===== Base reset ===== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ===== Scrollbar styling ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary-light);
+  border-radius: 4px;
+}

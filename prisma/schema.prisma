@@ -1,0 +1,326 @@
+// Prisma schema – Francilienne Energy
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Utilisateurs ───
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+}
+
+model User {
+  id             String          @id @default(cuid())
+  supabaseId     String          @unique
+  email          String          @unique
+  company        String
+  siret          String
+  firstName      String
+  lastName       String
+  phone          String?
+  address        String?
+  kbisUrl        String?
+  idCardFrontUrl String?
+  idCardBackUrl  String?
+  role           String          @default("CLIENT")
+  status         UserStatus      @default(PENDING)
+  rejectedReason String?
+  cgvAcceptedAt  DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  orders         Order[]
+  customerPrices CustomerPrice[]
+  cartItems      CartItem[]
+
+  @@index([email])
+  @@index([supabaseId])
+  @@index([status])
+}
+
+// ─── Marques ───
+
+model Brand {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  logoUrl   String?
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  @@index([slug])
+}
+
+// ─── Catégories ───
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  color     String    @default("#283084")
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  @@index([slug])
+}
+
+// ─── Fournisseurs ───
+
+model Supplier {
+  id        String           @id @default(cuid())
+  name      String           @unique
+  slug      String           @unique
+  active    Boolean          @default(true)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  variants  ProductVariant[]
+
+  @@index([slug])
+}
+
+// ─── Produits ───
+
+model Product {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  productGroupKey String?          // Clé interne de regroupement (ex: HUAWEI_SUN2000, BOITIER_MONO_SANS_OPTION)
+  family          String?          // DEPRECATED - migration vers categoryId
+  description     String?
+  active          Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  // Relations
+  brandId     String?
+  brand       Brand?           @relation(fields: [brandId], references: [id])
+  categoryId  String?
+  category    Category?        @relation(fields: [categoryId], references: [id])
+  imageId     String?          @unique
+  image       Image?           @relation(fields: [imageId], references: [id])
+  variants    ProductVariant[]
+  documents   ProductDocument[]
+
+  @@unique([productGroupKey, categoryId])
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([family])
+  @@index([slug])
+  @@index([productGroupKey])
+}
+
+model ProductVariant {
+  id                  String          @id @default(cuid())
+  sku                 String          @unique
+  designation         String
+  powerKw             Float?
+  capacity            Float?
+  supplierReference   String?         // Référence fournisseur (ex: DPR0025)
+  realStock           Float           @default(0)
+  catalogPriceHT      Float           @default(0)
+  active              Boolean         @default(true)
+  productId           String
+  product             Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplierId          String?
+  supplier            Supplier?       @relation(fields: [supplierId], references: [id])
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  customerPrices      CustomerPrice[]
+  orderItems          OrderItem[]
+  cartItems           CartItem[]
+  attributes          VariantAttribute[]
+
+  @@index([productId])
+  @@index([supplierId])
+  @@index([sku])
+}
+
+// ─── Attributs techniques des variantes (extensible) ───
+
+model VariantAttribute {
+  id        String         @id @default(cuid())
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  name      String         // ex: "Puissance", "Tension", "Rendement"
+  value     String         // ex: "25", "400", "97.5"
+  unit      String?        // ex: "kW", "V", "%"
+  createdAt DateTime       @default(now())
+
+  @@index([variantId])
+  @@index([name])
+}
+
+// ─── Prix client ───
+
+enum PriceType {
+  FIXED
+  PERCENTAGE
+}
+
+model CustomerPrice {
+  id        String    @id @default(cuid())
+  customerId String
+  variantId  String
+  type       PriceType
+  value      Float
+  startDate  DateTime?
+  endDate    DateTime?
+  note       String?
+  createdBy  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  customer   User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, variantId])
+}
+
+// ─── Médias ───
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String   @default("")
+  createdAt DateTime @default(now())
+  product   Product?
+}
+
+enum DocumentType {
+  FICHE_TECHNIQUE
+  NOTICE
+  CERTIFICATION
+  GARANTIE
+  AUTRE
+}
+
+model Document {
+  id        String           @id @default(cuid())
+  name      String
+  url       String
+  type      String           @default("FICHE_TECHNIQUE")
+  createdAt DateTime         @default(now())
+  products  ProductDocument[]
+}
+
+model ProductDocument {
+  productId  String
+  documentId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@id([productId, documentId])
+}
+
+// ─── Commandes ───
+
+enum OrderStatus {
+  DRAFT
+  SUBMITTED
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  reference   String      @unique
+  customerId  String
+  customer    User        @relation(fields: [customerId], references: [id])
+  status      OrderStatus @default(DRAFT)
+  totalHT     Float       @default(0)
+  totalTTC    Float       @default(0)
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id          String         @id @default(cuid())
+  orderId     String
+  order       Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  quantity    Int
+  unitPriceHT Float
+  totalHT     Float
+  createdAt   DateTime       @default(now())
+
+  @@index([orderId])
+}
+
+// ─── Import CSV ───
+
+enum ImportStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model CsvImport {
+  id              String       @id @default(cuid())
+  filename        String
+  rowsProcessed   Int          @default(0)
+  productsCreated Int          @default(0)
+  variantsCreated Int          @default(0)
+  errors          String?
+  status          ImportStatus @default(PROCESSING)
+  completedAt     DateTime?
+  createdAt       DateTime     @default(now())
+}
+
+// ─── Panier ───
+
+model CartItem {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity  Int            @default(1)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([userId, variantId])
+  @@index([userId])
+}
+
+// ─── Logs Admin ───
+
+enum AdminActionType {
+  CLIENT_APPROVED
+  CLIENT_REJECTED
+  PRICE_SET
+  PRICE_DELETED
+  ORDER_STATUS_CHANGED
+  IMPORT_CSV
+}
+
+model AdminLog {
+  id         String          @id @default(cuid())
+  adminId    String
+  action     AdminActionType
+  targetType String
+  targetId   String?
+  details    String?
+  createdAt  DateTime        @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
