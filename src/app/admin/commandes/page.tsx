@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   DRAFT: { label: "Brouillon", color: "text-gray-600", bg: "bg-gray-100" },
   SUBMITTED: { label: "Soumise", color: "text-blue-600", bg: "bg-blue-100" },

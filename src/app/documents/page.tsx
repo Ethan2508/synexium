@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const DOC_TYPE_LABELS: Record<string, { label: string; icon: string; color: string }> = {
   FICHE_TECHNIQUE: { label: "Fiche technique", icon: "📋", color: "text-blue-600 bg-blue-50" },
   NOTICE: { label: "Notice", icon: "📖", color: "text-purple-600 bg-purple-50" },

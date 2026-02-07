@@ -4,6 +4,8 @@ import { getAuthUser } from "@/lib/auth";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
 
+export const dynamic = "force-dynamic";
+
 /* =========================================================================
    FICHE PRODUIT – Détail gamme + variantes (schéma normalisé)
    ========================================================================= */

@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const ACTION_LABELS: Record<string, { label: string; color: string; icon: string }> = {
   CLIENT_APPROVED: { label: "Client validé", color: "text-green-600 bg-green-50", icon: "✓" },
   CLIENT_REJECTED: { label: "Client refusé", color: "text-red-600 bg-red-50", icon: "✗" },

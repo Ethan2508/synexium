@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 /* =========================================================================
    CATALOGUE – Liste produits B2B (schéma normalisé)
    ========================================================================= */
