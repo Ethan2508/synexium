@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import CartIcon from "@/components/CartIcon";
 
 /* ==========================================================================
    MEGA MENU - Catégories de produits
@@ -303,12 +304,22 @@ export default function Header() {
               <SearchIcon />
             </button>
 
+            {/* Cart */}
+            <CartIcon />
+
             {/* Account */}
             <Link
               href="/auth/login"
-              className="px-4 py-2 text-sm font-semibold bg-solar-green text-white rounded-lg hover:bg-solar-green/90 transition-colors"
+              className="hidden sm:flex px-4 py-2 text-sm font-semibold bg-solar-green text-white rounded-lg hover:bg-solar-green/90 transition-colors"
             >
               Mon compte
+            </Link>
+            <Link
+              href="/auth/login"
+              className="sm:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              aria-label="Mon compte"
+            >
+              <UserIcon />
             </Link>
 
             {/* Mobile burger */}
@@ -448,6 +459,13 @@ function ChevronRightIcon() {
   return (
     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
+function UserIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   );
 }

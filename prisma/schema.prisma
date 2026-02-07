@@ -43,6 +43,7 @@ model User {
   @@index([email])
   @@index([supabaseId])
   @@index([status])
+  @@unique([siret])
 }
 
 // ─── Marques ───
