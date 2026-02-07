@@ -43,7 +43,7 @@ export default async function AdminPage() {
     }),
     prisma.order.aggregate({
       _sum: { totalHT: true },
-      where: { status: { in: ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"] } },
+      where: { status: { in: ["CONFIRMED", "SHIPPED", "DELIVERED"] } },
     }),
   ]);
 
@@ -238,7 +238,6 @@ function StatusBadge({ status }: { status: string }) {
     DRAFT: { label: "Brouillon", bg: "bg-gray-100", text: "text-gray-600" },
     SUBMITTED: { label: "Soumise", bg: "bg-blue-100", text: "text-blue-700" },
     CONFIRMED: { label: "Confirmée", bg: "bg-green-100", text: "text-green-700" },
-    PROCESSING: { label: "En cours", bg: "bg-yellow-100", text: "text-yellow-700" },
     SHIPPED: { label: "Expédiée", bg: "bg-purple-100", text: "text-purple-700" },
     DELIVERED: { label: "Livrée", bg: "bg-emerald-100", text: "text-emerald-700" },
     CANCELLED: { label: "Annulée", bg: "bg-red-100", text: "text-red-700" },
