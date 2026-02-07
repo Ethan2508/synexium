@@ -15,8 +15,9 @@ export default function CartIcon() {
           const total = data.items?.reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0) || 0;
           setCartCount(total);
         }
-      } catch (error) {
-        console.error("Erreur chargement panier:", error);
+        // 401 = non connecté, pas d'erreur à afficher
+      } catch {
+        // Erreur réseau ignorée silencieusement
       }
     }
 
