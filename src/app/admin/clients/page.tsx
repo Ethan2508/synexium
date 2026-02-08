@@ -20,6 +20,17 @@ type Client = {
   _count: { orders: number; customerPrices: number };
 };
 
+type NewClientForm = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  company: string;
+  siret: string;
+  phone: string;
+  status: "ACTIVE" | "PENDING";
+};
+
 export default function AdminClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +39,21 @@ export default function AdminClientsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [rejectModal, setRejectModal] = useState<Client | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  
+  // Modal création client
+  const [createModal, setCreateModal] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [newClient, setNewClient] = useState<NewClientForm>({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    company: "",
+    siret: "",
+    phone: "",
+    status: "ACTIVE",
+  });
 
   const fetchClients = useCallback(async () => {
     setLoading(true);
@@ -74,11 +100,52 @@ export default function AdminClientsPage() {
     fetchClients();
   };
 
+  const handleCreateClient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateLoading(true);
+    setCreateError("");
+
+    try {
+      const res = await fetch("/api/admin/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newClient),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCreateError(data.error || "Erreur lors de la création");
+        setCreateLoading(false);
+        return;
+      }
+
+      // Succès - fermer modal et rafraîchir
+      setCreateModal(false);
+      setNewClient({
+        email: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+        company: "",
+        siret: "",
+        phone: "",
+        status: "ACTIVE",
+      });
+      fetchClients();
+    } catch {
+      setCreateError("Erreur de connexion");
+    }
+    setCreateLoading(false);
+  };
+
   const statusBadge: Record<string, { label: string; class: string }> = {
     PENDING: { label: "En attente", class: "bg-solar-yellow/10 text-solar-yellow" },
     ACTIVE: { label: "Actif", class: "bg-solar-green/10 text-solar-green" },
     REJECTED: { label: "Refusé", class: "bg-heatpump-red/10 text-heatpump-red" },
   };
+
+  const pendingCount = clients.filter(c => c.status === "PENDING").length;
 
   return (
     <div className="bg-surface min-h-screen">
@@ -90,10 +157,28 @@ export default function AdminClientsPage() {
             </Link>
             <h1 className="text-2xl font-bold mt-1">Gestion des clients</h1>
           </div>
+          <button
+            onClick={() => setCreateModal(true)}
+            className="px-5 py-2.5 bg-white text-primary font-bold rounded-lg hover:bg-white/90 transition flex items-center gap-2"
+          >
+            <span className="text-lg">+</span>
+            Créer un client
+          </button>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
+        {/* Alerte clients en attente */}
+        {pendingCount > 0 && (
+          <div className="bg-solar-yellow/10 border border-solar-yellow/30 rounded-xl p-4 flex items-center gap-4">
+            <span className="text-2xl">⏳</span>
+            <div>
+              <span className="font-bold text-solar-yellow">{pendingCount} client{pendingCount > 1 ? "s" : ""} en attente</span>
+              <span className="text-sm text-text-secondary ml-2">de validation</span>
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
         <div className="flex flex-wrap gap-3 items-center">
           <div className="flex gap-1 bg-white rounded-lg p-1 border border-border">
@@ -255,6 +340,155 @@ export default function AdminClientsPage() {
                 Annuler
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal création client */}
+      {createModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-text-primary">Créer un compte client</h3>
+              <button
+                onClick={() => setCreateModal(false)}
+                className="w-8 h-8 rounded-full hover:bg-surface flex items-center justify-center text-text-secondary"
+              >
+                ✕
+              </button>
+            </div>
+
+            {createError && (
+              <div className="mb-4 p-3 bg-heatpump-red/10 border border-heatpump-red/30 rounded-lg text-sm text-heatpump-red">
+                {createError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateClient} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-1">Prénom *</label>
+                  <input
+                    type="text"
+                    value={newClient.firstName}
+                    onChange={(e) => setNewClient({ ...newClient, firstName: e.target.value })}
+                    className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-1">Nom *</label>
+                  <input
+                    type="text"
+                    value={newClient.lastName}
+                    onChange={(e) => setNewClient({ ...newClient, lastName: e.target.value })}
+                    className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">Raison sociale *</label>
+                <input
+                  type="text"
+                  value={newClient.company}
+                  onChange={(e) => setNewClient({ ...newClient, company: e.target.value })}
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">SIRET *</label>
+                <input
+                  type="text"
+                  value={newClient.siret}
+                  onChange={(e) => setNewClient({ ...newClient, siret: e.target.value })}
+                  placeholder="12345678901234"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">Email *</label>
+                <input
+                  type="email"
+                  value={newClient.email}
+                  onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">Mot de passe *</label>
+                <input
+                  type="password"
+                  value={newClient.password}
+                  onChange={(e) => setNewClient({ ...newClient, password: e.target.value })}
+                  placeholder="Minimum 8 caractères"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  required
+                  minLength={8}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">Téléphone</label>
+                <input
+                  type="tel"
+                  value={newClient.phone}
+                  onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
+                  placeholder="06 12 34 56 78"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1">Statut initial</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={newClient.status === "ACTIVE"}
+                      onChange={() => setNewClient({ ...newClient, status: "ACTIVE" })}
+                      className="w-4 h-4 text-primary"
+                    />
+                    <span className="text-sm">Actif immédiatement</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={newClient.status === "PENDING"}
+                      onChange={() => setNewClient({ ...newClient, status: "PENDING" })}
+                      className="w-4 h-4 text-primary"
+                    />
+                    <span className="text-sm">En attente</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={createLoading}
+                  className="flex-1 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark disabled:opacity-50 transition"
+                >
+                  {createLoading ? "Création en cours…" : "Créer le compte"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCreateModal(false)}
+                  className="px-6 py-3 border border-border text-text-secondary rounded-lg hover:bg-surface transition"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
