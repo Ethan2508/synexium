@@ -12,6 +12,7 @@ import CartIcon from "@/components/CartIcon";
 const MENU_CATEGORIES = [
   {
     title: "Photovoltaïque",
+    slug: "photovoltaique",
     color: "#7fb727",
     sections: [
       {
@@ -42,6 +43,7 @@ const MENU_CATEGORIES = [
   },
   {
     title: "Intégration & Fixation",
+    slug: "integration",
     color: "#555",
     sections: [
       {
@@ -69,6 +71,7 @@ const MENU_CATEGORIES = [
   },
   {
     title: "Pompes à chaleur",
+    slug: "chauffage",
     color: "#e6332a",
     sections: [
       {
@@ -95,6 +98,7 @@ const MENU_CATEGORIES = [
   },
   {
     title: "Accessoires & Câblage",
+    slug: "accessoires",
     color: "#009fe3",
     sections: [
       {
@@ -309,13 +313,13 @@ export default function Header() {
 
             {/* Account */}
             <Link
-              href="/auth/login"
+              href="/compte"
               className="hidden sm:flex px-4 py-2 text-sm font-semibold bg-solar-green text-white rounded-lg hover:bg-solar-green/90 transition-colors"
             >
               Mon compte
             </Link>
             <Link
-              href="/auth/login"
+              href="/compte"
               className="sm:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
               aria-label="Mon compte"
             >
@@ -360,7 +364,7 @@ export default function Header() {
               {MENU_CATEGORIES.map((cat) => (
                 <Link
                   key={cat.title}
-                  href={`/catalogue?category=${encodeURIComponent(cat.title)}`}
+                  href={`/catalogue?category=${cat.slug}`}
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors text-sm"
                 >

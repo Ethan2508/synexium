@@ -82,28 +82,28 @@ export default function Home() {
               title="Photovoltaïque"
               description="Panneaux, onduleurs, micro-onduleurs, batteries et accessoires"
               color="#7fb727"
-              href="/catalogue?category=Photovoltaïque"
+              href="/catalogue?category=photovoltaique"
               icon={<SolarIcon />}
             />
             <CategoryCard
               title="Intégration"
               description="Structures K2, GSE, surimposition et intégration toiture"
               color="#555"
-              href="/catalogue?category=Intégration"
+              href="/catalogue?category=integration"
               icon={<StructureIcon />}
             />
             <CategoryCard
-              title="Pompes à chaleur"
+              title="Chauffage"
               description="PAC air-eau, air-air, ballons thermodynamiques, accessoires"
               color="#e6332a"
-              href="/catalogue?category=PAC"
+              href="/catalogue?category=chauffage"
               icon={<HeatIcon />}
             />
             <CategoryCard
               title="Accessoires"
               description="Câbles, protections, connectiques, boîtiers AC/DC"
               color="#009fe3"
-              href="/catalogue?category=Accessoires"
+              href="/catalogue?category=accessoires"
               icon={<AccessoryIcon />}
             />
           </div>

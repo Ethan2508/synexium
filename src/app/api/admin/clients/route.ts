@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
+import bcrypt from "bcryptjs";
 
 /**
  * GET /api/admin/clients
@@ -128,6 +129,100 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Accès admin requis." }, { status: 403 });
     }
     console.error("Erreur validation client:", error);
+    return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/admin/clients
+ * Créer un nouveau compte client. ADMIN uniquement.
+ * Body: { email, password, firstName, lastName, company, siret, phone?, status? }
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const admin = await requireAdmin();
+
+    const body = await request.json();
+    const { email, password, firstName, lastName, company, siret, phone, status = "ACTIVE" } = body;
+
+    // Validation
+    if (!email || !password || !firstName || !lastName || !company || !siret) {
+      return NextResponse.json(
+        { error: "Email, mot de passe, prénom, nom, société et SIRET sont requis." },
+        { status: 400 }
+      );
+    }
+
+    // Vérifier si email existe déjà
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return NextResponse.json({ error: "Un compte avec cet email existe déjà." }, { status: 400 });
+    }
+
+    // Créer le compte Supabase
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { role: "CLIENT", status },
+    });
+
+    if (authError) {
+      console.error("Erreur création Supabase:", authError);
+      return NextResponse.json({ error: `Erreur Supabase: ${authError.message}` }, { status: 500 });
+    }
+
+    // Hasher le mot de passe pour notre DB (fallback)
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    // Créer le user dans notre DB
+    const newClient = await prisma.user.create({
+      data: {
+        supabaseId: authData.user.id,
+        email,
+        passwordHash,
+        firstName,
+        lastName,
+        company,
+        siret,
+        phone: phone || null,
+        role: "CLIENT",
+        status: status === "ACTIVE" ? "ACTIVE" : "PENDING",
+      },
+    });
+
+    // Log admin
+    await prisma.adminLog.create({
+      data: {
+        adminId: admin.id,
+        action: "CLIENT_CREATED",
+        targetType: "User",
+        targetId: newClient.id,
+        details: `Compte créé par admin: ${company} (${email})`,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      client: {
+        id: newClient.id,
+        email: newClient.email,
+        company: newClient.company,
+        status: newClient.status,
+      },
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "";
+    if (msg === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Accès admin requis." }, { status: 403 });
+    }
+    console.error("Erreur création client:", error);
     return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });
   }
 }
