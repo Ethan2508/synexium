@@ -200,7 +200,7 @@ export default async function Home() {
           <div className="text-center mt-10">
             <Link
               href="/catalogue"
-              className="inline-flex items-center gap-2 px-8 py-3 text-base font-semibold bg-primary text-white rounded-xl hover:bg-primary-dark transition-all"
+              className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold bg-solar-green text-white rounded-xl hover:bg-solar-green/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Voir tout le catalogue
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
