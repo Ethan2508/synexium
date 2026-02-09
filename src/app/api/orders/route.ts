@@ -78,12 +78,12 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/orders
  * Crée une nouvelle commande à partir du panier
- * Body: { notes? }
+ * Body: { notes?, deliveryMethod?, pickupLocation?, deliveryAddress? }
  */
 export async function POST(request: NextRequest) {
   try {
     const user = await requireActiveUser();
-    const { notes } = await request.json().catch(() => ({}));
+    const { notes, deliveryMethod, pickupLocation, deliveryAddress } = await request.json().catch(() => ({}));
 
     // Récupérer le panier
     const cartItems = await prisma.cartItem.findMany({
@@ -144,6 +144,9 @@ export async function POST(request: NextRequest) {
           totalHT,
           totalTTC,
           notes,
+          deliveryMethod,
+          pickupLocation,
+          deliveryAddress,
           items: {
             create: orderItems,
           },

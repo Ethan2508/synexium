@@ -235,17 +235,27 @@ enum OrderStatus {
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  reference   String      @unique
-  customerId  String
-  customer    User        @relation(fields: [customerId], references: [id])
-  status      OrderStatus @default(DRAFT)
-  totalHT     Float       @default(0)
-  totalTTC    Float       @default(0)
-  notes       String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  items       OrderItem[]
+  id             String      @id @default(cuid())
+  reference      String      @unique
+  customerId     String
+  customer       User        @relation(fields: [customerId], references: [id])
+  status         OrderStatus @default(DRAFT)
+  totalHT        Float       @default(0)
+  totalTTC       Float       @default(0)
+  notes          String?
+  
+  // Livraison
+  deliveryMethod String?     // "DELIVERY" ou "PICKUP"
+  deliveryAddress String?    // Adresse complète formatée
+  pickupLocation String?     // "LYON" ou "PARIS"
+  trackingNumber String?     // Numéro de suivi transporteur
+  
+  // Documents
+  invoiceUrl     String?     // URL vers la facture PDF
+
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  items          OrderItem[]
 
   @@index([customerId])
   @@index([status])

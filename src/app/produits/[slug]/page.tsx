@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +59,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const user = await getAuthUser();
   const canSeePrices = user?.status === "ACTIVE";
   const categoryColor = product.category?.color || "#283084";
+
+  // Charger des produits similaires (même catégorie, excluant le produit actuel)
+  const relatedProducts = await prisma.product.findMany({
+    where: {
+      active: true,
+      id: { not: product.id },
+      categoryId: product.category?.id,
+    },
+    take: 4,
+    include: {
+      brand: true,
+      variants: {
+        where: { active: true },
+        orderBy: { catalogPriceHT: 'asc' },
+        take: 1,
+      },
+      image: true,
+    },
+    orderBy: { name: 'asc' },
+  });
 
   return (
     <div className="bg-surface min-h-screen">
@@ -234,6 +255,66 @@ export default async function ProductPage({ params }: ProductPageProps) {
           )}
         </div>
       </div>
+
+      {/* ── Produits similaires ── */}
+      {relatedProducts.length > 0 && (
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <h2 className="text-2xl font-bold text-text-primary mb-8">
+            Produits similaires
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {relatedProducts.map((p) => {
+              const variant = p.variants[0];
+              const price = canSeePrices && variant?.catalogPriceHT 
+                ? `${variant.catalogPriceHT.toFixed(2)} € HT` 
+                : null;
+
+              return (
+                <Link
+                  key={p.id}
+                  href={`/produits/${p.slug}`}
+                  className="group bg-white rounded-xl border border-border hover:shadow-lg hover:-translate-y-1 transition-all overflow-hidden"
+                >
+                  {/* Image */}
+                  <div className="relative h-48 bg-gray-50 flex items-center justify-center overflow-hidden">
+                    {p.image?.url ? (
+                      <Image
+                        src={p.image.url}
+                        alt={p.name}
+                        fill
+                        className="object-contain p-4 group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                      </svg>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4">
+                    <div className="text-xs font-semibold text-primary mb-1">
+                      {p.brand?.name}
+                    </div>
+                    <h3 className="font-semibold text-text-primary mb-2 line-clamp-2 text-sm">
+                      {p.name}
+                    </h3>
+                    {price ? (
+                      <div className="text-lg font-bold text-primary">
+                        {price}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-text-secondary italic">
+                        Connectez-vous pour voir les prix
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

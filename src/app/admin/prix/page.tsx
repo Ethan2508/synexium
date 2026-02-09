@@ -60,7 +60,7 @@ export default function AdminPrixPage() {
 
   // Charger les variantes
   useEffect(() => {
-    fetch("/api/products")
+    fetch("/api/products?limit=9999")
       .then((r) => r.json())
       .then((d) => {
         const allVariants: Variant[] = [];

@@ -40,6 +40,11 @@ export default function PanierPage() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [ordering, setOrdering] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Delivery options
+  const [deliveryMethod, setDeliveryMethod] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
+  const [pickupLocation, setPickupLocation] = useState<"LYON" | "PARIS">("LYON");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const fetchCart = async () => {
     try {
@@ -97,10 +102,23 @@ export default function PanierPage() {
   const placeOrder = async () => {
     setOrdering(true);
     setError(null);
+    
+    // Validation
+    if (deliveryMethod === "DELIVERY" && !deliveryAddress.trim()) {
+      setError("Veuillez saisir une adresse de livraison.");
+      setOrdering(false);
+      return;
+    }
+    
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deliveryMethod,
+          pickupLocation: deliveryMethod === "PICKUP" ? pickupLocation : null,
+          deliveryAddress: deliveryMethod === "DELIVERY" ? deliveryAddress : null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -252,8 +270,136 @@ export default function PanierPage() {
           </div>
 
           {/* Récapitulatif */}
-          <div className="lg:w-80 mt-6 lg:mt-0">
-            <div className="bg-white rounded-xl shadow-sm border border-border p-6 sticky top-24">
+          <div className="lg:w-80 mt-6 lg:mt-0 space-y-4">
+            {/* Mode de livraison */}
+            <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+              <h3 className="font-bold text-text-primary mb-4">Mode de récupération</h3>
+              
+              <div className="space-y-3">
+                {/* Livraison */}
+                <label className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  deliveryMethod === "DELIVERY" 
+                    ? "border-primary bg-primary/5" 
+                    : "border-border hover:border-primary/30"
+                }`}>
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value="DELIVERY"
+                    checked={deliveryMethod === "DELIVERY"}
+                    onChange={(e) => setDeliveryMethod(e.target.value as "DELIVERY" | "PICKUP")}
+                    className="mt-1 w-4 h-4 text-primary"
+                  />
+                  <div className="flex-1">
+                    <div className="font-semibold text-text-primary flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                      </svg>
+                      Livraison
+                    </div>
+                    <div className="text-xs text-text-secondary mt-1">
+                      Livraison en Île-de-France sous 24-48h
+                    </div>
+                  </div>
+                </label>
+
+                {/* Pickup */}
+                <label className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  deliveryMethod === "PICKUP" 
+                    ? "border-primary bg-primary/5" 
+                    : "border-border hover:border-primary/30"
+                }`}>
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value="PICKUP"
+                    checked={deliveryMethod === "PICKUP"}
+                    onChange={(e) => setDeliveryMethod(e.target.value as "DELIVERY" | "PICKUP")}
+                    className="mt-1 w-4 h-4 text-primary"
+                  />
+                  <div className="flex-1">
+                    <div className="font-semibold text-text-primary flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Retrait en magasin
+                    </div>
+                    <div className="text-xs text-text-secondary mt-1">
+                      Retrait gratuit sous 24h
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              {/* Adresse livraison */}
+              {deliveryMethod === "DELIVERY" && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-text-primary mb-2">
+                    Adresse de livraison *
+                  </label>
+                  <textarea
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    rows={4}
+                    placeholder="Nom de l'entreprise&#10;Numéro et rue&#10;Code postal et ville"
+                    className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+                  />
+                </div>
+              )}
+
+              {/* Choix magasin pickup */}
+              {deliveryMethod === "PICKUP" && (
+                <div className="mt-4 space-y-2">
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    pickupLocation === "LYON" 
+                      ? "border-primary bg-primary/5" 
+                      : "border-border hover:border-primary/30"
+                  }`}>
+                    <input
+                      type="radio"
+                      name="pickupLocation"
+                      value="LYON"
+                      checked={pickupLocation === "LYON"}
+                      onChange={(e) => setPickupLocation(e.target.value as "LYON" | "PARIS")}
+                      className="mt-1 w-4 h-4 text-primary"
+                    />
+                    <div className="text-sm">
+                      <div className="font-semibold text-text-primary">Synexium Lyon</div>
+                      <div className="text-text-secondary text-xs mt-0.5">
+                        218 Av. Franklin Roosevelt<br />
+                        69120 Vaulx-en-Velin
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    pickupLocation === "PARIS" 
+                      ? "border-primary bg-primary/5" 
+                      : "border-border hover:border-primary/30"
+                  }`}>
+                    <input
+                      type="radio"
+                      name="pickupLocation"
+                      value="PARIS"
+                      checked={pickupLocation === "PARIS"}
+                      onChange={(e) => setPickupLocation(e.target.value as "LYON" | "PARIS")}
+                      className="mt-1 w-4 h-4 text-primary"
+                    />
+                    <div className="text-sm">
+                      <div className="font-semibold text-text-primary">Synexium Paris</div>
+                      <div className="text-text-secondary text-xs mt-0.5">
+                        16 Av. du Valquiou, Bât. C<br />
+                        93290 Tremblay
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {/* Totaux */}
+            <div className="bg-white rounded-xl shadow-sm border border-border p-6">
               <h3 className="font-bold text-text-primary mb-4">Récapitulatif</h3>
 
               <div className="space-y-2 text-sm">

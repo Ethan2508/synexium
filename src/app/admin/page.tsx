@@ -34,7 +34,7 @@ export default async function AdminPage() {
     }),
     prisma.productVariant.findMany({
       where: { realStock: { lte: 5 }, active: true },
-      take: 10,
+      take: 5,
       select: { sku: true, designation: true, realStock: true },
       orderBy: { realStock: "asc" },
     }),
@@ -127,7 +127,7 @@ export default async function AdminPage() {
             {lowStockVariants.length === 0 ? (
               <p className="text-sm text-text-secondary">Tous les stocks sont corrects</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                 {lowStockVariants.map((variant) => (
                   <div
                     key={variant.sku}

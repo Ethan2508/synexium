@@ -1,10 +1,33 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
+import Image from "next/image";
 
 /* =========================================================================
    HOME – Francilienne Energy B2B
    ========================================================================= */
 
-export default function Home() {
+export default async function Home() {
+  // Charger les produits du moment
+  const user = await getAuthUser();
+  const canSeePrices = user?.status === "ACTIVE";
+  
+  const featuredProducts = await prisma.product.findMany({
+    where: { active: true },
+    take: 8,
+    include: {
+      brand: true,
+      category: true,
+      variants: {
+        where: { active: true },
+        orderBy: { catalogPriceHT: 'asc' },
+        take: 1,
+      },
+      image: true,
+    },
+    orderBy: { name: 'asc' },
+  });
+
   return (
     <>
       {/* ── Hero Section ── */}
@@ -106,6 +129,84 @@ export default function Home() {
               href="/catalogue?category=accessoires"
               icon={<AccessoryIcon />}
             />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Produits du moment ── */}
+      <section className="bg-white py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+              Produits du moment
+            </h2>
+            <p className="text-text-secondary max-w-xl mx-auto">
+              Sélection de produits disponibles en stock
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredProducts.map((product) => {
+              const variant = product.variants[0];
+              const price = canSeePrices && variant?.catalogPriceHT 
+                ? `${variant.catalogPriceHT.toFixed(2)} € HT` 
+                : null;
+
+              return (
+                <Link
+                  key={product.id}
+                  href={`/produits/${product.slug}`}
+                  className="group bg-surface rounded-xl border border-border hover:shadow-lg hover:-translate-y-1 transition-all overflow-hidden"
+                >
+                  {/* Image */}
+                  <div className="relative h-48 bg-gray-50 flex items-center justify-center overflow-hidden">
+                    {product.image?.url ? (
+                      <Image
+                        src={product.image.url}
+                        alt={product.name}
+                        fill
+                        className="object-contain p-4 group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                      </svg>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4">
+                    <div className="text-xs font-semibold text-primary mb-1">
+                      {product.brand?.name}
+                    </div>
+                    <h3 className="font-semibold text-text-primary mb-2 line-clamp-2 text-sm">
+                      {product.name}
+                    </h3>
+                    {price ? (
+                      <div className="text-lg font-bold text-primary">
+                        {price}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-text-secondary italic">
+                        Connectez-vous pour voir les prix
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/catalogue"
+              className="inline-flex items-center gap-2 px-8 py-3 text-base font-semibold bg-primary text-white rounded-xl hover:bg-primary-dark transition-all"
+            >
+              Voir tout le catalogue
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
