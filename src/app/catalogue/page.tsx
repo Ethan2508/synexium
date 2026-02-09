@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
    ========================================================================= */
 
 interface CataloguePageProps {
-  searchParams: Promise<{ category?: string; brand?: string; search?: string }>;
+  searchParams: Promise<{ category?: string; brand?: string; search?: string; family?: string }>;
 }
 
 type CategoryWithCount = {
@@ -38,7 +38,7 @@ type ProductWithRelations = {
 };
 
 export default async function CataloguePage({ searchParams }: CataloguePageProps) {
-  const { category, brand, search } = await searchParams;
+  const { category, brand, search, family } = await searchParams;
   const user = await getAuthUser();
   const canSeePrices = user?.status === "ACTIVE";
 
@@ -58,6 +58,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
   const whereClause: Record<string, unknown> = { active: true };
   if (category) whereClause.category = { slug: category };
   if (brand) whereClause.brand = { slug: brand };
+  if (family) whereClause.family = { contains: family, mode: "insensitive" };
   if (search) {
     whereClause.OR = [
       { name: { contains: search, mode: "insensitive" } },
@@ -82,6 +83,13 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
   const total = categories.reduce((s, c) => s + c._count.products, 0);
   const activeCategory = categories.find(c => c.slug === category);
   const activeBrand = brands.find(b => b.slug === brand);
+  
+  // Titre dynamique selon le filtre actif
+  const pageTitle = family 
+    ? family.replace(/\+/g, " ")
+    : activeCategory?.name 
+    || activeBrand?.name 
+    || "Tous les produits";
 
   return (
     <div className="bg-surface min-h-screen">
@@ -89,7 +97,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
       <div className="bg-primary text-white">
         <div className="max-w-7xl mx-auto px-6 py-10">
           <h1 className="text-3xl font-bold mb-2">
-            {activeCategory?.name || activeBrand?.name || "Tous les produits"}
+            {pageTitle}
           </h1>
           <p className="text-white/70 text-sm">
             {products.length} produit{products.length > 1 ? "s" : ""} trouvé
