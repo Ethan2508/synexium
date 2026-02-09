@@ -44,7 +44,10 @@ export default function PanierPage() {
   // Delivery options
   const [deliveryMethod, setDeliveryMethod] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
   const [pickupLocation, setPickupLocation] = useState<"LYON" | "PARIS">("LYON");
-  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [deliveryCompany, setDeliveryCompany] = useState("");
+  const [deliveryStreet, setDeliveryStreet] = useState("");
+  const [deliveryPostal, setDeliveryPostal] = useState("");
+  const [deliveryCity, setDeliveryCity] = useState("");
 
   const fetchCart = async () => {
     try {
@@ -104,11 +107,17 @@ export default function PanierPage() {
     setError(null);
     
     // Validation
-    if (deliveryMethod === "DELIVERY" && !deliveryAddress.trim()) {
-      setError("Veuillez saisir une adresse de livraison.");
-      setOrdering(false);
-      return;
+    if (deliveryMethod === "DELIVERY") {
+      if (!deliveryCompany.trim() || !deliveryStreet.trim() || !deliveryPostal.trim() || !deliveryCity.trim()) {
+        setError("Veuillez remplir tous les champs de l'adresse de livraison.");
+        setOrdering(false);
+        return;
+      }
     }
+    
+    const deliveryAddress = deliveryMethod === "DELIVERY" 
+      ? `${deliveryCompany}\n${deliveryStreet}\n${deliveryPostal} ${deliveryCity}`
+      : null;
     
     try {
       const res = await fetch("/api/orders", {
@@ -117,7 +126,7 @@ export default function PanierPage() {
         body: JSON.stringify({
           deliveryMethod,
           pickupLocation: deliveryMethod === "PICKUP" ? pickupLocation : null,
-          deliveryAddress: deliveryMethod === "DELIVERY" ? deliveryAddress : null,
+          deliveryAddress,
         }),
       });
       const data = await res.json();
@@ -334,17 +343,57 @@ export default function PanierPage() {
 
               {/* Adresse livraison */}
               {deliveryMethod === "DELIVERY" && (
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-text-primary mb-2">
-                    Adresse de livraison *
-                  </label>
-                  <textarea
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    rows={4}
-                    placeholder="Nom de l'entreprise&#10;Numéro et rue&#10;Code postal et ville"
-                    className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary resize-none"
-                  />
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-text-secondary mb-1">
+                      Nom de l'entreprise *
+                    </label>
+                    <input
+                      type="text"
+                      value={deliveryCompany}
+                      onChange={(e) => setDeliveryCompany(e.target.value)}
+                      placeholder="Synexium SARL"
+                      className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-text-secondary mb-1">
+                      Rue et numéro *
+                    </label>
+                    <input
+                      type="text"
+                      value={deliveryStreet}
+                      onChange={(e) => setDeliveryStreet(e.target.value)}
+                      placeholder="218 Avenue Franklin Roosevelt"
+                      className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1">
+                        Code postal *
+                      </label>
+                      <input
+                        type="text"
+                        value={deliveryPostal}
+                        onChange={(e) => setDeliveryPostal(e.target.value)}
+                        placeholder="69120"
+                        className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1">
+                        Ville *
+                      </label>
+                      <input
+                        type="text"
+                        value={deliveryCity}
+                        onChange={(e) => setDeliveryCity(e.target.value)}
+                        placeholder="Vaulx-en-Velin"
+                        className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 

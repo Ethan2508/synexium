@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface AddToCartButtonProps {
   variantId: string;
@@ -8,9 +9,10 @@ interface AddToCartButtonProps {
 }
 
 export default function AddToCartButton({ variantId, stock }: AddToCartButtonProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const outOfStock = stock <= 0;
@@ -19,7 +21,6 @@ export default function AddToCartButton({ variantId, stock }: AddToCartButtonPro
     if (outOfStock || loading) return;
     setLoading(true);
     setError(null);
-    setSuccess(false);
 
     try {
       const res = await fetch("/api/cart", {
@@ -33,8 +34,10 @@ export default function AddToCartButton({ variantId, stock }: AddToCartButtonPro
         throw new Error(data.error || "Erreur lors de l'ajout au panier");
       }
 
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2500);
+      setShowModal(true);
+      
+      // Forcer le rechargement du compteur panier dans le header
+      window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
@@ -51,60 +54,94 @@ export default function AddToCartButton({ variantId, stock }: AddToCartButtonPro
   }
 
   return (
-    <div className="flex items-center gap-2 shrink-0">
-      {/* Sélecteur de quantité */}
-      <div className="flex items-center border border-border rounded-lg overflow-hidden">
+    <>
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Sélecteur de quantité */}
+        <div className="flex items-center border border-border rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            className="px-2.5 py-2 text-sm font-bold text-text-secondary hover:bg-surface transition-colors"
+            disabled={loading}
+          >
+            −
+          </button>
+          <input
+            type="number"
+            min={1}
+            max={Math.floor(stock)}
+            value={quantity}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val) && val >= 1 && val <= Math.floor(stock)) {
+                setQuantity(val);
+              }
+            }}
+            className="w-12 text-center text-sm font-semibold border-x border-border py-2 focus:outline-none"
+            disabled={loading}
+          />
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => Math.min(Math.floor(stock), q + 1))}
+            className="px-2.5 py-2 text-sm font-bold text-text-secondary hover:bg-surface transition-colors"
+            disabled={loading}
+          >
+            +
+          </button>
+        </div>
+
+        {/* Bouton ajouter */}
         <button
           type="button"
-          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-          className="px-2.5 py-2 text-sm font-bold text-text-secondary hover:bg-surface transition-colors"
+          onClick={handleAddToCart}
           disabled={loading}
+          className="px-4 py-2.5 text-sm font-bold rounded-lg transition-colors bg-primary text-white hover:bg-primary-dark disabled:opacity-50"
         >
-          −
+          {loading ? "…" : "+ Panier"}
         </button>
-        <input
-          type="number"
-          min={1}
-          max={Math.floor(stock)}
-          value={quantity}
-          onChange={(e) => {
-            const val = parseInt(e.target.value, 10);
-            if (!isNaN(val) && val >= 1 && val <= Math.floor(stock)) {
-              setQuantity(val);
-            }
-          }}
-          className="w-12 text-center text-sm font-semibold border-x border-border py-2 focus:outline-none"
-          disabled={loading}
-        />
-        <button
-          type="button"
-          onClick={() => setQuantity((q) => Math.min(Math.floor(stock), q + 1))}
-          className="px-2.5 py-2 text-sm font-bold text-text-secondary hover:bg-surface transition-colors"
-          disabled={loading}
-        >
-          +
-        </button>
+
+        {error && (
+          <span className="text-xs text-heatpump-red max-w-[140px] leading-tight">
+            {error}
+          </span>
+        )}
       </div>
 
-      {/* Bouton ajouter */}
-      <button
-        type="button"
-        onClick={handleAddToCart}
-        disabled={loading}
-        className={`px-4 py-2.5 text-sm font-bold rounded-lg transition-colors ${
-          success
-            ? "bg-solar-green text-white"
-            : "bg-primary text-white hover:bg-primary-dark"
-        } disabled:opacity-50`}
-      >
-        {loading ? "…" : success ? "✓ Ajouté" : "+ Panier"}
-      </button>
+      {/* Modale de confirmation */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-solar-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-solar-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-text-primary mb-2">
+                Produit ajouté au panier
+              </h3>
+              <p className="text-text-secondary text-sm">
+                {quantity} article{quantity > 1 ? "s" : ""} ajouté{quantity > 1 ? "s" : ""} avec succès
+              </p>
+            </div>
 
-      {error && (
-        <span className="text-xs text-heatpump-red max-w-[140px] leading-tight">
-          {error}
-        </span>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 px-6 py-3 border-2 border-primary text-primary font-semibold rounded-xl hover:bg-primary/5 transition-all"
+              >
+                Continuer mes achats
+              </button>
+              <button
+                onClick={() => router.push("/panier")}
+                className="flex-1 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-all shadow-lg"
+              >
+                Voir le panier
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 }

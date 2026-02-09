@@ -23,9 +23,15 @@ export default function CartIcon() {
 
     fetchCartCount();
 
+    // Écouter les mises à jour du panier
+    window.addEventListener("cartUpdated", fetchCartCount);
+
     // Rafraîchir le compteur toutes les 30s
     const interval = setInterval(fetchCartCount, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("cartUpdated", fetchCartCount);
+    };
   }, []);
 
   return (
