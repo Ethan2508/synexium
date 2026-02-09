@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
-import bcrypt from "bcryptjs";
 
 /**
  * GET /api/admin/clients
@@ -178,15 +177,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Erreur Supabase: ${authError.message}` }, { status: 500 });
     }
 
-    // Hasher le mot de passe pour notre DB (fallback)
-    const passwordHash = await bcrypt.hash(password, 12);
-
     // Créer le user dans notre DB
     const newClient = await prisma.user.create({
       data: {
         supabaseId: authData.user.id,
         email,
-        passwordHash,
         firstName,
         lastName,
         company,
