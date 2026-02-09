@@ -1,38 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 export default function CartIcon() {
   const [cartCount, setCartCount] = useState(0);
+  const isAuthenticated = useRef<boolean | null>(null);
+
+  const fetchCartCount = useCallback(async () => {
+    // Si on sait déjà que l'utilisateur n'est pas connecté, ne pas appeler l'API
+    if (isAuthenticated.current === false) return;
+
+    try {
+      const res = await fetch("/api/cart");
+      if (res.ok) {
+        isAuthenticated.current = true;
+        const data = await res.json();
+        const total = data.items?.reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0) || 0;
+        setCartCount(total);
+      } else if (res.status === 401 || res.status === 403) {
+        // Non connecté ou pas ACTIVE — arrêter le polling
+        isAuthenticated.current = false;
+        setCartCount(0);
+      }
+    } catch {
+      // Erreur réseau ignorée silencieusement
+    }
+  }, []);
 
   useEffect(() => {
-    async function fetchCartCount() {
-      try {
-        const res = await fetch("/api/cart");
-        if (res.ok) {
-          const data = await res.json();
-          const total = data.items?.reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0) || 0;
-          setCartCount(total);
-        }
-        // 401 = non connecté, pas d'erreur à afficher
-      } catch {
-        // Erreur réseau ignorée silencieusement
-      }
-    }
-
     fetchCartCount();
 
-    // Écouter les mises à jour du panier
-    window.addEventListener("cartUpdated", fetchCartCount);
+    // Écouter les mises à jour du panier (force un re-fetch même si non-auth)
+    const handleCartUpdate = () => {
+      isAuthenticated.current = null; // reset pour permettre un nouvel appel
+      fetchCartCount();
+    };
+    window.addEventListener("cartUpdated", handleCartUpdate);
 
-    // Rafraîchir le compteur toutes les 30s
-    const interval = setInterval(fetchCartCount, 30000);
+    // Rafraîchir toutes les 60s uniquement si authentifié
+    const interval = setInterval(() => {
+      if (isAuthenticated.current === true) {
+        fetchCartCount();
+      }
+    }, 60000);
+
     return () => {
       clearInterval(interval);
-      window.removeEventListener("cartUpdated", fetchCartCount);
+      window.removeEventListener("cartUpdated", handleCartUpdate);
     };
-  }, []);
+  }, [fetchCartCount]);
 
   return (
     <Link
