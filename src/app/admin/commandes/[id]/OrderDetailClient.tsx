@@ -23,7 +23,12 @@ type Order = {
   totalTTC: number;
   notes: string | null;
   createdAt: string;
-  customer: { company: string; email: string; firstName: string; lastName: string };
+  deliveryMethod: string | null;
+  deliveryAddress: string | null;
+  pickupLocation: string | null;
+  trackingNumber: string | null;
+  invoiceUrl: string | null;
+  customer: { company: string; email: string; firstName: string; lastName: string; phone: string | null; address: string | null };
   items: Array<{
     id: string;
     quantity: number;
@@ -33,10 +38,21 @@ type Order = {
   }>;
 };
 
+const PICKUP_ADDRESSES: Record<string, string> = {
+  LYON: "218 Av. Franklin Roosevelt, 69120 Vaulx-en-Velin",
+  PARIS: "16 Avenue du Valquiou, Bâtiment C, 93290 Tremblay-en-France",
+};
+
 export default function OrderDetailClient({ order }: { order: Order }) {
   const router = useRouter();
   const [status, setStatus] = useState(order.status);
   const [updating, setUpdating] = useState(false);
+
+  // Tracking & Invoice editing
+  const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber || "");
+  const [invoiceUrl, setInvoiceUrl] = useState(order.invoiceUrl || "");
+  const [savingFields, setSavingFields] = useState(false);
+  const [fieldsSaved, setFieldsSaved] = useState(false);
 
   const handleStatusChange = async (newStatus: string) => {
     setUpdating(true);
@@ -52,6 +68,28 @@ export default function OrderDetailClient({ order }: { order: Order }) {
       }
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleSaveFields = async () => {
+    setSavingFields(true);
+    setFieldsSaved(false);
+    try {
+      const res = await fetch("/api/admin/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: order.id,
+          trackingNumber: trackingNumber || null,
+          invoiceUrl: invoiceUrl || null,
+        }),
+      });
+      if (res.ok) {
+        setFieldsSaved(true);
+        setTimeout(() => setFieldsSaved(false), 3000);
+      }
+    } finally {
+      setSavingFields(false);
     }
   };
 
@@ -122,33 +160,117 @@ export default function OrderDetailClient({ order }: { order: Order }) {
           </div>
         </div>
 
-        {/* Infos client */}
-        <div className="bg-white rounded-xl shadow-sm border border-border p-6">
-          <h2 className="font-bold text-text-primary mb-4">Informations client</h2>
-          <div className="grid sm:grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-text-secondary">Société</p>
-              <p className="font-medium">{order.customer.company}</p>
+        {/* Infos client + Livraison */}
+        <div className="grid sm:grid-cols-2 gap-8">
+          {/* Infos client */}
+          <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+            <h2 className="font-bold text-text-primary mb-4">Informations client</h2>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-text-secondary">Société</p>
+                <p className="font-medium">{order.customer.company}</p>
+              </div>
+              <div>
+                <p className="text-text-secondary">Contact</p>
+                <p className="font-medium">{order.customer.firstName} {order.customer.lastName}</p>
+              </div>
+              <div>
+                <p className="text-text-secondary">Email</p>
+                <p className="font-medium">{order.customer.email}</p>
+              </div>
+              {order.customer.phone && (
+                <div>
+                  <p className="text-text-secondary">Téléphone</p>
+                  <p className="font-medium">{order.customer.phone}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-text-secondary">Date de commande</p>
+                <p className="font-medium">{new Date(order.createdAt).toLocaleDateString("fr-FR")}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-text-secondary">Contact</p>
-              <p className="font-medium">{order.customer.firstName} {order.customer.lastName}</p>
+            {order.notes && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="text-text-secondary text-sm">Notes client</p>
+                <p className="text-sm mt-1">{order.notes}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Livraison + Suivi + Facture */}
+          <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+            <h2 className="font-bold text-text-primary mb-4">Livraison</h2>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-text-secondary">Mode</p>
+                <p className="font-medium">
+                  {order.deliveryMethod === "PICKUP" ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      Retrait en magasin
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-orange-500" />
+                      Livraison
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              {order.deliveryMethod === "PICKUP" && order.pickupLocation && (
+                <div>
+                  <p className="text-text-secondary">Magasin de retrait</p>
+                  <p className="font-medium">{order.pickupLocation}</p>
+                  <p className="text-xs text-text-secondary mt-0.5">
+                    {PICKUP_ADDRESSES[order.pickupLocation] || ""}
+                  </p>
+                </div>
+              )}
+
+              {order.deliveryMethod === "DELIVERY" && (
+                <div>
+                  <p className="text-text-secondary">Adresse de livraison</p>
+                  <p className="font-medium">{order.deliveryAddress || order.customer.address || "Non renseignée"}</p>
+                </div>
+              )}
             </div>
-            <div>
-              <p className="text-text-secondary">Email</p>
-              <p className="font-medium">{order.customer.email}</p>
-            </div>
-            <div>
-              <p className="text-text-secondary">Date de commande</p>
-              <p className="font-medium">{new Date(order.createdAt).toLocaleDateString("fr-FR")}</p>
+
+            {/* Suivi & Facture */}
+            <div className="mt-6 pt-4 border-t border-border space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1">
+                  Numéro de suivi
+                </label>
+                <input
+                  type="text"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  placeholder="Ex: 1Z999AA10123456784"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1">
+                  Lien facture (URL)
+                </label>
+                <input
+                  type="url"
+                  value={invoiceUrl}
+                  onChange={(e) => setInvoiceUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <button
+                onClick={handleSaveFields}
+                disabled={savingFields}
+                className="w-full py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition disabled:opacity-50"
+              >
+                {savingFields ? "Enregistrement..." : fieldsSaved ? "✓ Enregistré" : "Enregistrer suivi & facture"}
+              </button>
             </div>
           </div>
-          {order.notes && (
-            <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-text-secondary text-sm">Notes</p>
-              <p className="text-sm mt-1">{order.notes}</p>
-            </div>
-          )}
         </div>
 
         {/* Articles */}

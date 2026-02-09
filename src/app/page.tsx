@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import Image from "next/image";
 
+export const dynamic = "force-dynamic";
+
 /* =========================================================================
    HOME – Francilienne Energy B2B
    ========================================================================= */

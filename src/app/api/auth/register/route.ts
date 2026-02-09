@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { sendRegistrationEmail, sendNewClientNotification } from "@/lib/email";
 
 /**
  * POST /api/auth/register
@@ -93,6 +94,10 @@ export async function POST(request: NextRequest) {
     await supabase.auth.updateUser({
       data: { role: user.role, status: user.status },
     });
+
+    // Emails transactionnels (non-bloquants)
+    sendRegistrationEmail(email, firstName);
+    sendNewClientNotification(company, email, siretClean);
 
     return NextResponse.json({
       success: true,

@@ -128,18 +128,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Variante introuvable." }, { status: 404 });
     }
 
-    // Vérifier le stock disponible
-    if (quantity > variant.realStock) {
+    // Vérifier si l'article existe déjà dans le panier
+    const existingItem = await prisma.cartItem.findUnique({
+      where: { userId_variantId: { userId: user.id, variantId } },
+    });
+
+    const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
+
+    // Vérifier le stock pour la quantité totale
+    if (newQuantity > variant.realStock) {
       return NextResponse.json(
-        { error: `Stock insuffisant. Disponible : ${Math.floor(variant.realStock)}` },
+        { error: `Stock insuffisant. Disponible : ${Math.floor(variant.realStock)}. Déjà au panier : ${existingItem?.quantity || 0}` },
         { status: 400 }
       );
     }
 
-    // Upsert: ajoute ou met à jour la quantité
+    // Upsert: ADDITIONNE la quantité si l'article existe déjà
     const cartItem = await prisma.cartItem.upsert({
       where: { userId_variantId: { userId: user.id, variantId } },
-      update: { quantity },
+      update: { quantity: newQuantity },
       create: { userId: user.id, variantId, quantity },
     });
 

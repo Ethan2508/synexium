@@ -59,15 +59,11 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const admin = await requireAdmin();
-    const { orderId, status } = await request.json();
+    const body = await request.json();
+    const { orderId, status, trackingNumber, invoiceUrl } = body;
 
-    if (!orderId || !status) {
-      return NextResponse.json({ error: "orderId et status requis." }, { status: 400 });
-    }
-
-    const validStatuses = ["DRAFT", "SUBMITTED", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"];
-    if (!validStatuses.includes(status)) {
-      return NextResponse.json({ error: "Statut invalide." }, { status: 400 });
+    if (!orderId) {
+      return NextResponse.json({ error: "orderId requis." }, { status: 400 });
     }
 
     const order = await prisma.order.findUnique({ where: { id: orderId } });
@@ -75,19 +71,50 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Commande introuvable." }, { status: 404 });
     }
 
+    // Build update data
+    const updateData: Record<string, unknown> = {};
+
+    // Update status if provided
+    if (status) {
+      const validStatuses = ["DRAFT", "SUBMITTED", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"];
+      if (!validStatuses.includes(status)) {
+        return NextResponse.json({ error: "Statut invalide." }, { status: 400 });
+      }
+      updateData.status = status;
+    }
+
+    // Update tracking number if provided (allow null to clear)
+    if (trackingNumber !== undefined) {
+      updateData.trackingNumber = trackingNumber;
+    }
+
+    // Update invoice URL if provided (allow null to clear)
+    if (invoiceUrl !== undefined) {
+      updateData.invoiceUrl = invoiceUrl;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: "Aucune modification fournie." }, { status: 400 });
+    }
+
     const updated = await prisma.order.update({
       where: { id: orderId },
-      data: { status },
+      data: updateData,
     });
 
     // Log admin
+    const details: string[] = [];
+    if (status) details.push(`Statut: ${order.status} → ${status}`);
+    if (trackingNumber !== undefined) details.push(`Suivi: ${trackingNumber || "(supprimé)"}`);
+    if (invoiceUrl !== undefined) details.push(`Facture: ${invoiceUrl || "(supprimé)"}`);
+
     await prisma.adminLog.create({
       data: {
         adminId: admin.id,
         action: "ORDER_STATUS_CHANGED",
         targetType: "Order",
         targetId: orderId,
-        details: `Statut changé: ${order.status} -> ${status}`,
+        details: details.join(" | "),
       },
     });
 

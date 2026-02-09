@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
+import { sendAccountApprovedEmail, sendAccountRejectedEmail } from "@/lib/email";
 
 /**
  * GET /api/admin/clients
@@ -113,6 +114,13 @@ export async function PATCH(request: NextRequest) {
         details: action === "reject" ? `Motif: ${reason || "Non spécifié"}` : null,
       },
     });
+
+    // Emails de notification au client (non-bloquant)
+    if (action === "approve") {
+      sendAccountApprovedEmail(client.email, client.firstName);
+    } else {
+      sendAccountRejectedEmail(client.email, client.firstName, reason);
+    }
 
     return NextResponse.json({
       success: true,

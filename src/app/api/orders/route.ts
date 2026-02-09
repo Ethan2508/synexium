@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireActiveUser, requireAdmin, getAuthUser } from "@/lib/auth";
+import { sendOrderConfirmationEmail, sendNewOrderNotification } from "@/lib/email";
 
 /**
  * Calcule le prix final pour un client.
@@ -177,6 +178,22 @@ export async function POST(request: NextRequest) {
       return newOrder;
     });
 
+    // Emails de confirmation (non-bloquants)
+    sendOrderConfirmationEmail(
+      user.email,
+      user.firstName,
+      order.reference,
+      order.totalTTC,
+      order.items.map((item) => ({
+        designation: item.variant.designation,
+        quantity: item.quantity,
+        unitPriceHT: item.unitPriceHT,
+      })),
+      deliveryMethod || "DELIVERY",
+      pickupLocation
+    );
+    sendNewOrderNotification(user.company, order.reference, order.totalTTC);
+
     return NextResponse.json({
       success: true,
       order: {
@@ -188,6 +205,8 @@ export async function POST(request: NextRequest) {
         itemCount: order.items.length,
       },
     });
+
+    // Note: emails envoyés après la réponse pour ne pas bloquer
   } catch (error) {
     const msg = error instanceof Error ? error.message : "";
     if (msg === "UNAUTHENTICATED") {

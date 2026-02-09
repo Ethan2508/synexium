@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SiretAutocomplete from "@/components/ui/SiretAutocomplete";
+import { createSupabaseBrowser } from "@/lib/supabase/client";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -66,6 +67,11 @@ export default function RegisterPage() {
       }
 
       setUserId(data.userId);
+
+      // Auto-login pour que le Step 2 (upload docs) fonctionne
+      const supabase = createSupabaseBrowser();
+      await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
+
       setStep(2);
     } catch {
       setError("Erreur réseau.");
@@ -245,11 +251,11 @@ export default function RegisterPage() {
               />
               <label htmlFor="cgv" className="text-sm text-text-secondary">
                 J'accepte les{" "}
-                <Link href="/cgv" target="_blank" className="text-primary font-semibold hover:underline">
+                <Link href="/legal/cgv" target="_blank" className="text-primary font-semibold hover:underline">
                   Conditions Générales de Vente
                 </Link>{" "}
                 et la{" "}
-                <Link href="/confidentialite" target="_blank" className="text-primary font-semibold hover:underline">
+                <Link href="/legal/confidentialite" target="_blank" className="text-primary font-semibold hover:underline">
                   Politique de Confidentialité
                 </Link>{" "}
                 de Francilienne Energy. *

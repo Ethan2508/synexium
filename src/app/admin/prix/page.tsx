@@ -19,7 +19,7 @@ interface Variant {
 
 interface CustomerPrice {
   id: string;
-  priceType: "FIXED" | "PERCENTAGE";
+  type: "FIXED" | "PERCENTAGE";
   value: number;
   startDate: string | null;
   endDate: string | null;
@@ -169,7 +169,7 @@ export default function AdminPrixPage() {
 
   // Prix affiché
   function formatPrice(price: CustomerPrice) {
-    if (price.priceType === "FIXED") {
+    if (price.type === "FIXED") {
       return `${price.value.toFixed(2)} € HT`;
     }
     const basePrice = price.variant.catalogPriceHT || 0;

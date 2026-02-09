@@ -19,7 +19,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
     where: { id },
     include: {
       customer: {
-        select: { company: true, email: true, firstName: true, lastName: true },
+        select: { company: true, email: true, firstName: true, lastName: true, phone: true, address: true },
       },
       items: {
         include: {
