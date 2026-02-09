@@ -5,10 +5,17 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL = process.env.EMAIL_FROM || "Francilienne Energy <noreply@synexium.vercel.app>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "contact@francilienne-energy.fr";
 
+/** Guard : si pas de clé API Resend configurée, on skip silencieusement */
+function isEmailEnabled() {
+  const key = process.env.RESEND_API_KEY;
+  return !!key && key !== "re_PLACEHOLDER_configure_on_vercel";
+}
+
 /**
  * Email envoyé au client après inscription (PENDING)
  */
 export async function sendRegistrationEmail(to: string, firstName: string) {
+  if (!isEmailEnabled()) return;
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
@@ -34,6 +41,7 @@ export async function sendRegistrationEmail(to: string, firstName: string) {
  * Email envoyé à l'admin quand un nouveau client s'inscrit
  */
 export async function sendNewClientNotification(company: string, email: string, siret: string) {
+  if (!isEmailEnabled()) return;
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
@@ -62,6 +70,7 @@ export async function sendNewClientNotification(company: string, email: string, 
  * Email envoyé au client quand son compte est ACTIVÉ
  */
 export async function sendAccountApprovedEmail(to: string, firstName: string) {
+  if (!isEmailEnabled()) return;
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
@@ -96,6 +105,7 @@ export async function sendAccountApprovedEmail(to: string, firstName: string) {
  * Email envoyé au client quand son compte est REFUSÉ
  */
 export async function sendAccountRejectedEmail(to: string, firstName: string, reason?: string) {
+  if (!isEmailEnabled()) return;
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
@@ -129,6 +139,7 @@ export async function sendOrderConfirmationEmail(
   deliveryMethod: string,
   pickupLocation?: string | null
 ) {
+  if (!isEmailEnabled()) return;
   try {
     const itemsHtml = items
       .map(
@@ -197,6 +208,7 @@ export async function sendNewOrderNotification(
   orderReference: string,
   totalTTC: number
 ) {
+  if (!isEmailEnabled()) return;
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
