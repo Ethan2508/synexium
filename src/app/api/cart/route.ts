@@ -111,6 +111,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Vérifier que la quantité est un entier
+    if (!Number.isInteger(quantity)) {
+      return NextResponse.json(
+        { error: "La quantité doit être un nombre entier." },
+        { status: 400 }
+      );
+    }
+
     // Vérifier que la variante existe
     const variant = await prisma.productVariant.findUnique({
       where: { id: variantId, active: true },
@@ -118,6 +126,14 @@ export async function POST(request: NextRequest) {
 
     if (!variant) {
       return NextResponse.json({ error: "Variante introuvable." }, { status: 404 });
+    }
+
+    // Vérifier le stock disponible
+    if (quantity > variant.realStock) {
+      return NextResponse.json(
+        { error: `Stock insuffisant. Disponible : ${Math.floor(variant.realStock)}` },
+        { status: 400 }
+      );
     }
 
     // Upsert: ajoute ou met à jour la quantité

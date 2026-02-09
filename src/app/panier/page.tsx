@@ -113,6 +113,14 @@ export default function PanierPage() {
         setOrdering(false);
         return;
       }
+      
+      // Validation format code postal français
+      const postalRegex = /^\d{5}$/;
+      if (!postalRegex.test(deliveryPostal)) {
+        setError("Le code postal doit contenir 5 chiffres.");
+        setOrdering(false);
+        return;
+      }
     }
     
     const deliveryAddress = deliveryMethod === "DELIVERY" 
@@ -131,7 +139,7 @@ export default function PanierPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error);
+        setError(data?.error || "Une erreur est survenue lors de la validation de votre commande.");
         return;
       }
       router.push(`/compte/commandes/${data.order.id}?success=1`);
