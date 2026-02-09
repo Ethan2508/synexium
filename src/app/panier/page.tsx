@@ -40,14 +40,10 @@ export default function PanierPage() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [ordering, setOrdering] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Delivery options
+
+  // Choix livraison
   const [deliveryMethod, setDeliveryMethod] = useState<"DELIVERY" | "PICKUP">("DELIVERY");
   const [pickupLocation, setPickupLocation] = useState<"LYON" | "PARIS">("LYON");
-  const [deliveryCompany, setDeliveryCompany] = useState("");
-  const [deliveryStreet, setDeliveryStreet] = useState("");
-  const [deliveryPostal, setDeliveryPostal] = useState("");
-  const [deliveryCity, setDeliveryCity] = useState("");
 
   const fetchCart = async () => {
     try {
@@ -105,28 +101,7 @@ export default function PanierPage() {
   const placeOrder = async () => {
     setOrdering(true);
     setError(null);
-    
-    // Validation
-    if (deliveryMethod === "DELIVERY") {
-      if (!deliveryCompany.trim() || !deliveryStreet.trim() || !deliveryPostal.trim() || !deliveryCity.trim()) {
-        setError("Veuillez remplir tous les champs de l'adresse de livraison.");
-        setOrdering(false);
-        return;
-      }
-      
-      // Validation format code postal français
-      const postalRegex = /^\d{5}$/;
-      if (!postalRegex.test(deliveryPostal)) {
-        setError("Le code postal doit contenir 5 chiffres.");
-        setOrdering(false);
-        return;
-      }
-    }
-    
-    const deliveryAddress = deliveryMethod === "DELIVERY" 
-      ? `${deliveryCompany}\n${deliveryStreet}\n${deliveryPostal} ${deliveryCity}`
-      : null;
-    
+
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -134,12 +109,11 @@ export default function PanierPage() {
         body: JSON.stringify({
           deliveryMethod,
           pickupLocation: deliveryMethod === "PICKUP" ? pickupLocation : null,
-          deliveryAddress,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data?.error || "Une erreur est survenue lors de la validation de votre commande.");
+        setError(data?.error || "Une erreur est survenue lors de la validation.");
         return;
       }
       router.push(`/compte/commandes/${data.order.id}?success=1`);
@@ -214,7 +188,6 @@ export default function PanierPage() {
                 key={item.id}
                 className="bg-white rounded-xl shadow-sm border border-border p-4 flex gap-4"
               >
-                {/* Image */}
                 <Link href={`/produits/${item.product.slug}`} className="shrink-0">
                   <div className="w-20 h-20 bg-surface rounded-lg flex items-center justify-center">
                     {item.product.image ? (
@@ -229,7 +202,6 @@ export default function PanierPage() {
                   </div>
                 </Link>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <Link href={`/produits/${item.product.slug}`}>
                     <h3 className="font-semibold text-text-primary hover:text-primary transition-colors line-clamp-1">
@@ -245,7 +217,6 @@ export default function PanierPage() {
                   </p>
                   <p className="text-xs text-text-secondary mt-0.5">SKU : {item.variant.sku}</p>
 
-                  {/* Quantité */}
                   <div className="flex items-center gap-2 mt-3">
                     <button
                       onClick={() => updateQuantity(item.variant.id, item.quantity - 1)}
@@ -272,7 +243,6 @@ export default function PanierPage() {
                   </div>
                 </div>
 
-                {/* Prix */}
                 <div className="text-right shrink-0">
                   <div className="text-lg font-bold text-primary">
                     {item.totalHT.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
@@ -286,17 +256,16 @@ export default function PanierPage() {
             ))}
           </div>
 
-          {/* Récapitulatif */}
+          {/* Sidebar */}
           <div className="lg:w-80 mt-6 lg:mt-0 space-y-4">
-            {/* Mode de livraison */}
-            <div className="bg-white rounded-xl shadow-sm border border-border p-6">
-              <h3 className="font-bold text-text-primary mb-4">Mode de récupération</h3>
-              
-              <div className="space-y-3">
-                {/* Livraison */}
-                <label className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                  deliveryMethod === "DELIVERY" 
-                    ? "border-primary bg-primary/5" 
+            {/* Mode de récupération */}
+            <div className="bg-white rounded-xl shadow-sm border border-border p-5">
+              <h3 className="font-bold text-text-primary mb-3">Mode de récupération</h3>
+
+              <div className="space-y-2">
+                <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                  deliveryMethod === "DELIVERY"
+                    ? "border-primary bg-primary/5"
                     : "border-border hover:border-primary/30"
                 }`}>
                   <input
@@ -305,25 +274,17 @@ export default function PanierPage() {
                     value="DELIVERY"
                     checked={deliveryMethod === "DELIVERY"}
                     onChange={(e) => setDeliveryMethod(e.target.value as "DELIVERY" | "PICKUP")}
-                    className="mt-1 w-4 h-4 text-primary"
+                    className="w-4 h-4 text-primary"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-text-primary flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                      </svg>
-                      Livraison
-                    </div>
-                    <div className="text-xs text-text-secondary mt-1">
-                      Livraison en Île-de-France sous 24-48h
-                    </div>
+                    <div className="font-semibold text-text-primary text-sm">Livraison</div>
+                    <div className="text-xs text-text-secondary">À votre adresse sous 24-48h</div>
                   </div>
                 </label>
 
-                {/* Pickup */}
-                <label className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                  deliveryMethod === "PICKUP" 
-                    ? "border-primary bg-primary/5" 
+                <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                  deliveryMethod === "PICKUP"
+                    ? "border-primary bg-primary/5"
                     : "border-border hover:border-primary/30"
                 }`}>
                   <input
@@ -332,85 +293,21 @@ export default function PanierPage() {
                     value="PICKUP"
                     checked={deliveryMethod === "PICKUP"}
                     onChange={(e) => setDeliveryMethod(e.target.value as "DELIVERY" | "PICKUP")}
-                    className="mt-1 w-4 h-4 text-primary"
+                    className="w-4 h-4 text-primary"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-text-primary flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      Retrait en magasin
-                    </div>
-                    <div className="text-xs text-text-secondary mt-1">
-                      Retrait gratuit sous 24h
-                    </div>
+                    <div className="font-semibold text-text-primary text-sm">Retrait en magasin</div>
+                    <div className="text-xs text-text-secondary">Gratuit, sous 24h</div>
                   </div>
                 </label>
               </div>
 
-              {/* Adresse livraison */}
-              {deliveryMethod === "DELIVERY" && (
-                <div className="mt-4 space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-text-secondary mb-1">
-                      Nom de l'entreprise *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryCompany}
-                      onChange={(e) => setDeliveryCompany(e.target.value)}
-                      placeholder="Synexium SARL"
-                      className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-text-secondary mb-1">
-                      Rue et numéro *
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryStreet}
-                      onChange={(e) => setDeliveryStreet(e.target.value)}
-                      placeholder="218 Avenue Franklin Roosevelt"
-                      className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-text-secondary mb-1">
-                        Code postal *
-                      </label>
-                      <input
-                        type="text"
-                        value={deliveryPostal}
-                        onChange={(e) => setDeliveryPostal(e.target.value)}
-                        placeholder="69120"
-                        className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-text-secondary mb-1">
-                        Ville *
-                      </label>
-                      <input
-                        type="text"
-                        value={deliveryCity}
-                        onChange={(e) => setDeliveryCity(e.target.value)}
-                        placeholder="Vaulx-en-Velin"
-                        className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Choix magasin pickup */}
               {deliveryMethod === "PICKUP" && (
-                <div className="mt-4 space-y-2">
+                <div className="mt-3 space-y-2">
                   <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                    pickupLocation === "LYON" 
-                      ? "border-primary bg-primary/5" 
+                    pickupLocation === "LYON"
+                      ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/30"
                   }`}>
                     <input
@@ -419,20 +316,17 @@ export default function PanierPage() {
                       value="LYON"
                       checked={pickupLocation === "LYON"}
                       onChange={(e) => setPickupLocation(e.target.value as "LYON" | "PARIS")}
-                      className="mt-1 w-4 h-4 text-primary"
+                      className="mt-0.5 w-4 h-4 text-primary"
                     />
                     <div className="text-sm">
                       <div className="font-semibold text-text-primary">Synexium Lyon</div>
-                      <div className="text-text-secondary text-xs mt-0.5">
-                        218 Av. Franklin Roosevelt<br />
-                        69120 Vaulx-en-Velin
-                      </div>
+                      <div className="text-text-secondary text-xs">218 Av. Franklin Roosevelt, 69120 Vaulx-en-Velin</div>
                     </div>
                   </label>
 
                   <label className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                    pickupLocation === "PARIS" 
-                      ? "border-primary bg-primary/5" 
+                    pickupLocation === "PARIS"
+                      ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/30"
                   }`}>
                     <input
@@ -441,14 +335,11 @@ export default function PanierPage() {
                       value="PARIS"
                       checked={pickupLocation === "PARIS"}
                       onChange={(e) => setPickupLocation(e.target.value as "LYON" | "PARIS")}
-                      className="mt-1 w-4 h-4 text-primary"
+                      className="mt-0.5 w-4 h-4 text-primary"
                     />
                     <div className="text-sm">
                       <div className="font-semibold text-text-primary">Synexium Paris</div>
-                      <div className="text-text-secondary text-xs mt-0.5">
-                        16 Av. du Valquiou, Bât. C<br />
-                        93290 Tremblay
-                      </div>
+                      <div className="text-text-secondary text-xs">16 Av. du Valquiou, Bât. C, 93290 Tremblay</div>
                     </div>
                   </label>
                 </div>
@@ -456,7 +347,7 @@ export default function PanierPage() {
             </div>
 
             {/* Totaux */}
-            <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-border p-5">
               <h3 className="font-bold text-text-primary mb-4">Récapitulatif</h3>
 
               <div className="space-y-2 text-sm">
@@ -496,7 +387,11 @@ export default function PanierPage() {
               </button>
 
               <p className="text-xs text-text-secondary text-center mt-4">
-                En validant, vous acceptez nos conditions générales de vente.
+                En validant, vous acceptez nos{" "}
+                <Link href="/legal/cgv" className="underline hover:text-primary">
+                  CGV
+                </Link>
+                .
               </p>
             </div>
           </div>

@@ -10,6 +10,7 @@ export type AuthUser = {
   company: string;
   siret: string;
   phone: string | null;
+  address: string | null;
   role: string;
   status: "PENDING" | "ACTIVE" | "REJECTED";
   kbisUrl: string | null;
@@ -46,6 +47,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
       company: dbUser.company,
       siret: dbUser.siret,
       phone: dbUser.phone,
+      address: dbUser.address,
       role: dbUser.role,
       status: dbUser.status as AuthUser["status"],
       kbisUrl: dbUser.kbisUrl,

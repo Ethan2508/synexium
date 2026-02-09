@@ -78,12 +78,15 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/orders
  * Crée une nouvelle commande à partir du panier
- * Body: { notes?, deliveryMethod?, pickupLocation?, deliveryAddress? }
+ * Body: { notes?, deliveryMethod?, pickupLocation? }
  */
 export async function POST(request: NextRequest) {
   try {
     const user = await requireActiveUser();
-    const { notes, deliveryMethod, pickupLocation, deliveryAddress } = await request.json().catch(() => ({}));
+    const { notes, deliveryMethod, pickupLocation } = await request.json().catch(() => ({}));
+
+    // Pour la livraison, on utilise l'adresse du profil utilisateur
+    const deliveryAddress = deliveryMethod === "DELIVERY" ? (user.address || `${user.company}`) : null;
 
     // Récupérer le panier
     const cartItems = await prisma.cartItem.findMany({
