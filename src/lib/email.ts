@@ -1,7 +1,5 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM_EMAIL = process.env.EMAIL_FROM || "Francilienne Energy <noreply@synexium.vercel.app>";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "contact@francilienne-energy.fr";
 
@@ -11,13 +9,18 @@ function isEmailEnabled() {
   return !!key && key !== "re_PLACEHOLDER_configure_on_vercel";
 }
 
+/** Lazy init Resend client — n'explose pas au build si la clé est absente */
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
 /**
  * Email envoyé au client après inscription (PENDING)
  */
 export async function sendRegistrationEmail(to: string, firstName: string) {
   if (!isEmailEnabled()) return;
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to,
       subject: "Inscription reçue – Francilienne Energy",
@@ -43,7 +46,7 @@ export async function sendRegistrationEmail(to: string, firstName: string) {
 export async function sendNewClientNotification(company: string, email: string, siret: string) {
   if (!isEmailEnabled()) return;
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
       subject: `Nouveau client en attente – ${company}`,
@@ -72,7 +75,7 @@ export async function sendNewClientNotification(company: string, email: string, 
 export async function sendAccountApprovedEmail(to: string, firstName: string) {
   if (!isEmailEnabled()) return;
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to,
       subject: "Compte activé – Francilienne Energy",
@@ -107,7 +110,7 @@ export async function sendAccountApprovedEmail(to: string, firstName: string) {
 export async function sendAccountRejectedEmail(to: string, firstName: string, reason?: string) {
   if (!isEmailEnabled()) return;
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to,
       subject: "Demande de compte – Francilienne Energy",
@@ -157,7 +160,7 @@ export async function sendOrderConfirmationEmail(
         ? `Retrait en magasin – ${pickupLocation || ""}`
         : "Livraison à votre adresse";
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to,
       subject: `Commande ${orderReference} confirmée – Francilienne Energy`,
@@ -210,7 +213,7 @@ export async function sendNewOrderNotification(
 ) {
   if (!isEmailEnabled()) return;
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
       subject: `Nouvelle commande ${orderReference} – ${company}`,

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // ── Validation ──
-    if (!email || !password || !firstName || !lastName || !company || !siret) {
+    if (!email || !password || !firstName || !lastName || !company || !siret || !phone || !address || !postalCode || !city || !tvaNumber || !codeApe || !activity || !contactFunction || !accountingContactName || !accountingContactEmail || !iban || !bic) {
       return NextResponse.json(
         { error: "Tous les champs obligatoires doivent être remplis." },
         { status: 400 }
