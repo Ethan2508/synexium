@@ -25,6 +25,16 @@ export default function RegisterPage() {
     siret: "",
     phone: "",
     address: "",
+    postalCode: "",
+    city: "",
+    tvaNumber: "",
+    codeApe: "",
+    activity: "",
+    contactFunction: "",
+    accountingContactName: "",
+    accountingContactEmail: "",
+    iban: "",
+    bic: "",
   });
   const [cgvAccepted, setCgvAccepted] = useState(false);
 
@@ -219,7 +229,12 @@ export default function RegisterPage() {
                 required 
                 placeholder="123 456 789 00012" 
               />
-              <InputField label="Téléphone" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="06 12 34 56 78" />
+              <InputField label="N° TVA intracommunautaire" name="tvaNumber" value={form.tvaNumber} onChange={handleChange} placeholder="FR 12 345678901" />
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <InputField label="Code APE" name="codeApe" value={form.codeApe} onChange={handleChange} placeholder="4321A" />
+              <InputField label="Activité" name="activity" value={form.activity} onChange={handleChange} placeholder="Installation d'équipements thermiques" />
             </div>
 
             <InputField 
@@ -227,8 +242,35 @@ export default function RegisterPage() {
               name="address" 
               value={form.address} 
               onChange={handleChange} 
-              placeholder="12 rue de la Paix, 75002 Paris" 
+              placeholder="12 rue de la Paix" 
             />
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <InputField label="Code postal" name="postalCode" value={form.postalCode} onChange={handleChange} placeholder="75002" />
+              <InputField label="Ville" name="city" value={form.city} onChange={handleChange} placeholder="Paris" />
+            </div>
+
+            <InputField label="Téléphone" name="phone" value={form.phone} onChange={handleChange} type="tel" placeholder="06 12 34 56 78" />
+
+            <hr className="border-border" />
+            <h2 className="text-lg font-bold text-text-primary">Contact principal</h2>
+
+            <InputField label="Fonction" name="contactFunction" value={form.contactFunction} onChange={handleChange} placeholder="Gérant, Directeur achat…" />
+
+            <hr className="border-border" />
+            <h2 className="text-lg font-bold text-text-primary">Contact comptable</h2>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <InputField label="Nom du contact comptable" name="accountingContactName" value={form.accountingContactName} onChange={handleChange} placeholder="Nom et prénom" />
+              <InputField label="Email comptable" name="accountingContactEmail" value={form.accountingContactEmail} onChange={handleChange} type="email" placeholder="compta@entreprise.fr" />
+            </div>
+
+            <hr className="border-border" />
+            <h2 className="text-lg font-bold text-text-primary">Coordonnées bancaires</h2>
+            <p className="text-sm text-text-secondary -mt-2">Pour le paiement par virement</p>
+
+            <InputField label="IBAN" name="iban" value={form.iban} onChange={handleChange} placeholder="FR76 1234 5678 9012 3456 7890 123" />
+            <InputField label="BIC" name="bic" value={form.bic} onChange={handleChange} placeholder="BNPAFRPP" />
 
             <hr className="border-border" />
             <h2 className="text-lg font-bold text-text-primary">Identifiants de connexion</h2>

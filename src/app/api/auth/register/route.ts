@@ -10,7 +10,12 @@ import { sendRegistrationEmail, sendNewClientNotification } from "@/lib/email";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, firstName, lastName, company, siret, phone, address, cgvAccepted } = body;
+    const {
+      email, password, firstName, lastName, company, siret,
+      phone, address, postalCode, city, tvaNumber, codeApe,
+      activity, contactFunction, accountingContactName,
+      accountingContactEmail, iban, bic, cgvAccepted
+    } = body;
 
     // ── Validation ──
     if (!email || !password || !firstName || !lastName || !company || !siret) {
@@ -84,6 +89,16 @@ export async function POST(request: NextRequest) {
         siret: siretClean,
         phone: phone || null,
         address: address || null,
+        postalCode: postalCode || null,
+        city: city || null,
+        tvaNumber: tvaNumber || null,
+        codeApe: codeApe || null,
+        activity: activity || null,
+        contactFunction: contactFunction || null,
+        accountingContactName: accountingContactName || null,
+        accountingContactEmail: accountingContactEmail || null,
+        iban: iban || null,
+        bic: bic || null,
         role: "CLIENT",
         status: "PENDING",
         cgvAcceptedAt: new Date(),

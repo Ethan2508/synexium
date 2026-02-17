@@ -18,27 +18,37 @@ enum UserStatus {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  supabaseId     String          @unique
-  email          String          @unique
-  company        String
-  siret          String
-  firstName      String
-  lastName       String
-  phone          String?
-  address        String?
-  kbisUrl        String?
-  idCardFrontUrl String?
-  idCardBackUrl  String?
-  role           String          @default("CLIENT")
-  status         UserStatus      @default(PENDING)
-  rejectedReason String?
-  cgvAcceptedAt  DateTime?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  orders         Order[]
-  customerPrices CustomerPrice[]
-  cartItems      CartItem[]
+  id                    String          @id @default(cuid())
+  supabaseId            String          @unique
+  email                 String          @unique
+  company               String
+  siret                 String
+  firstName             String
+  lastName              String
+  phone                 String?
+  address               String?
+  postalCode            String?
+  city                  String?
+  tvaNumber             String?
+  codeApe               String?
+  activity              String?
+  contactFunction       String?
+  accountingContactName  String?
+  accountingContactEmail String?
+  iban                  String?
+  bic                   String?
+  kbisUrl               String?
+  idCardFrontUrl        String?
+  idCardBackUrl         String?
+  role                  String          @default("CLIENT")
+  status                UserStatus      @default(PENDING)
+  rejectedReason        String?
+  cgvAcceptedAt         DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  orders                Order[]
+  customerPrices        CustomerPrice[]
+  cartItems             CartItem[]
 
   @@index([email])
   @@index([supabaseId])
