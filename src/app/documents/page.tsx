@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // ISR: revalider toutes les 5 min
 
 const DOC_TYPE_LABELS: Record<string, { label: string; icon: string; color: string }> = {
   FICHE_TECHNIQUE: { label: "Fiche technique", icon: "📋", color: "text-blue-600 bg-blue-50" },

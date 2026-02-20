@@ -1,32 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireActiveUser, requireAdmin, getAuthUser } from "@/lib/auth";
+import { requireActiveUser, getAuthUser } from "@/lib/auth";
 import { sendOrderConfirmationEmail, sendNewOrderNotification } from "@/lib/email";
-
-/**
- * Calcule le prix final pour un client.
- */
-async function calculatePrice(variantId: string, customerId: string): Promise<number> {
-  const variant = await prisma.productVariant.findUnique({
-    where: { id: variantId },
-    select: { catalogPriceHT: true },
-  });
-
-  if (!variant) throw new Error("Variante introuvable");
-
-  const customerPrice = await prisma.customerPrice.findUnique({
-    where: { customerId_variantId: { customerId, variantId } },
-  });
-
-  if (!customerPrice) return variant.catalogPriceHT;
-
-  const now = new Date();
-  if (customerPrice.startDate && customerPrice.startDate > now) return variant.catalogPriceHT;
-  if (customerPrice.endDate && customerPrice.endDate < now) return variant.catalogPriceHT;
-
-  if (customerPrice.type === "FIXED") return customerPrice.value;
-  return variant.catalogPriceHT * (1 - customerPrice.value / 100);
-}
+import { calculatePricesBatch } from "@/lib/pricing";
 
 /**
  * Génère une référence de commande unique
@@ -119,21 +95,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculer les prix et totaux
+    // Calculer les prix en batch (2 requêtes au lieu de N*2)
+    const variantIds = cartItems.map((item) => item.variantId);
+    const pricesMap = await calculatePricesBatch(variantIds, user.id);
+
     let totalHT = 0;
-    const orderItems = await Promise.all(
-      cartItems.map(async (item) => {
-        const unitPriceHT = await calculatePrice(item.variantId, user.id);
-        const lineTotal = unitPriceHT * item.quantity;
-        totalHT += lineTotal;
-        return {
-          variantId: item.variantId,
-          quantity: item.quantity,
-          unitPriceHT,
-          totalHT: lineTotal,
-        };
-      })
-    );
+    const orderItems = cartItems.map((item) => {
+      const unitPriceHT = pricesMap.get(item.variantId) ?? 0;
+      const lineTotal = unitPriceHT * item.quantity;
+      totalHT += lineTotal;
+      return {
+        variantId: item.variantId,
+        quantity: item.quantity,
+        unitPriceHT,
+        totalHT: lineTotal,
+      };
+    });
 
     const totalTTC = totalHT * 1.2;
 

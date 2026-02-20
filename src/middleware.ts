@@ -76,9 +76,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match toutes les routes sauf les fichiers statiques et _next
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/admin/:path*",
+    "/compte/:path*",
+    "/auth/:path*",
+    "/api/cart/:path*",
+    "/api/orders/:path*",
+    "/api/admin/:path*",
   ],
 };

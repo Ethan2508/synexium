@@ -1,19 +1,14 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
 import Image from "next/image";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: revalider toutes les 60s
 
 /* =========================================================================
    HOME – Francilienne Energy B2B
    ========================================================================= */
 
 export default async function Home() {
-  // Charger les produits du moment
-  const user = await getAuthUser();
-  const canSeePrices = user?.status === "ACTIVE";
-  
   const featuredProducts = await prisma.product.findMany({
     where: { active: true },
     take: 8,
@@ -148,13 +143,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => {
-              const variant = product.variants[0];
-              const price = canSeePrices && variant?.catalogPriceHT 
-                ? `${variant.catalogPriceHT.toFixed(2)} € HT` 
-                : null;
-
-              return (
+            {featuredProducts.map((product) => (
                 <Link
                   key={product.id}
                   href={`/produits/${product.slug}`}
@@ -167,6 +156,7 @@ export default async function Home() {
                         src={product.image.url}
                         alt={product.name}
                         fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         className="object-contain p-4 group-hover:scale-105 transition-transform"
                       />
                     ) : (
@@ -184,19 +174,12 @@ export default async function Home() {
                     <h3 className="font-semibold text-text-primary mb-2 line-clamp-2 text-sm">
                       {product.name}
                     </h3>
-                    {price ? (
-                      <div className="text-lg font-bold text-primary">
-                        {price}
-                      </div>
-                    ) : (
-                      <div className="text-sm text-text-secondary italic">
-                        Connectez-vous pour voir les prix
-                      </div>
-                    )}
+                    <div className="text-sm text-text-secondary italic">
+                      Connectez-vous pour voir les prix
+                    </div>
                   </div>
                 </Link>
-              );
-            })}
+              ))}
           </div>
 
           <div className="text-center mt-10">

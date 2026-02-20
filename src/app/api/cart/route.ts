@@ -1,31 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, requireActiveUser } from "@/lib/auth";
-
-/**
- * Calcule le prix final pour un client.
- */
-async function calculatePrice(variantId: string, customerId: string): Promise<number> {
-  const variant = await prisma.productVariant.findUnique({
-    where: { id: variantId },
-    select: { catalogPriceHT: true },
-  });
-
-  if (!variant) throw new Error("Variante introuvable");
-
-  const customerPrice = await prisma.customerPrice.findUnique({
-    where: { customerId_variantId: { customerId, variantId } },
-  });
-
-  if (!customerPrice) return variant.catalogPriceHT;
-
-  const now = new Date();
-  if (customerPrice.startDate && customerPrice.startDate > now) return variant.catalogPriceHT;
-  if (customerPrice.endDate && customerPrice.endDate < now) return variant.catalogPriceHT;
-
-  if (customerPrice.type === "FIXED") return customerPrice.value;
-  return variant.catalogPriceHT * (1 - customerPrice.value / 100);
-}
+import { requireActiveUser } from "@/lib/auth";
+import { calculatePricesBatch } from "@/lib/pricing";
 
 /**
  * GET /api/cart
@@ -49,28 +25,29 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    // Calculer les prix pour chaque item
-    const itemsWithPrices = await Promise.all(
-      cartItems.map(async (item) => {
-        const unitPrice = await calculatePrice(item.variantId, user.id);
-        return {
-          id: item.id,
-          quantity: item.quantity,
-          variant: {
-            id: item.variant.id,
-            sku: item.variant.sku,
-            designation: item.variant.designation,
-            powerKw: item.variant.powerKw,
-            capacity: item.variant.capacity,
-            realStock: item.variant.realStock,
-            catalogPriceHT: item.variant.catalogPriceHT,
-          },
-          product: item.variant.product,
-          unitPriceHT: unitPrice,
-          totalHT: unitPrice * item.quantity,
-        };
-      })
-    );
+    // Calcul batch des prix (2 requêtes au lieu de N*2)
+    const variantIds = cartItems.map((item) => item.variantId);
+    const pricesMap = await calculatePricesBatch(variantIds, user.id);
+
+    const itemsWithPrices = cartItems.map((item) => {
+      const unitPrice = pricesMap.get(item.variantId) ?? item.variant.catalogPriceHT;
+      return {
+        id: item.id,
+        quantity: item.quantity,
+        variant: {
+          id: item.variant.id,
+          sku: item.variant.sku,
+          designation: item.variant.designation,
+          powerKw: item.variant.powerKw,
+          capacity: item.variant.capacity,
+          realStock: item.variant.realStock,
+          catalogPriceHT: item.variant.catalogPriceHT,
+        },
+        product: item.variant.product,
+        unitPriceHT: unitPrice,
+        totalHT: unitPrice * item.quantity,
+      };
+    });
 
     const totalHT = itemsWithPrices.reduce((sum, item) => sum + item.totalHT, 0);
     const totalTTC = totalHT * 1.2; // TVA 20%

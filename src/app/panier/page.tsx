@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type CartItem = {
@@ -191,9 +192,11 @@ export default function PanierPage() {
                 <Link href={`/produits/${item.product.slug}`} className="shrink-0">
                   <div className="w-20 h-20 bg-surface rounded-lg flex items-center justify-center">
                     {item.product.image ? (
-                      <img
+                      <Image
                         src={item.product.image.url}
                         alt={item.product.image.alt}
+                        width={80}
+                        height={80}
                         className="w-full h-full object-contain p-2"
                       />
                     ) : (

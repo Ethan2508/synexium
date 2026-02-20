@@ -5,7 +5,7 @@ import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
 import Image from "next/image";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: revalider toutes les 60s
 
 /* =========================================================================
    FICHE PRODUIT – Détail gamme + variantes (schéma normalisé)
@@ -107,12 +107,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="max-w-7xl mx-auto px-6 py-10 lg:flex gap-10">
         {/* ── Image ── */}
         <div className="lg:w-1/2 mb-8 lg:mb-0">
-          <div className="bg-white rounded-2xl shadow-sm border border-border aspect-square flex items-center justify-center p-10 sticky top-24">
+          <div className="bg-white rounded-2xl shadow-sm border border-border aspect-square relative sticky top-24">
             {product.image ? (
-              <img
+              <Image
                 src={product.image.url}
                 alt={product.image.alt}
-                className="w-full h-full object-contain"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-contain p-10"
+                priority
               />
             ) : (
               <span className="text-8xl opacity-20">📦</span>
@@ -282,6 +285,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                         src={p.image.url}
                         alt={p.name}
                         fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         className="object-contain p-4 group-hover:scale-105 transition-transform"
                       />
                     ) : (

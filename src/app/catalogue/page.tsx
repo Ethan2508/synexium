@@ -1,8 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: revalider toutes les 60s
 
 /* =========================================================================
    CATALOGUE – Liste produits B2B (schéma normalisé)
@@ -39,20 +39,18 @@ type ProductWithRelations = {
 
 export default async function CataloguePage({ searchParams }: CataloguePageProps) {
   const { category, brand, search, family } = await searchParams;
-  const user = await getAuthUser();
-  const canSeePrices = user?.status === "ACTIVE";
 
-  // Récupérer les catégories avec comptage
-  const categories = await prisma.category.findMany({
-    include: { _count: { select: { products: true } } },
-    orderBy: { name: "asc" },
-  }) as CategoryWithCount[];
-
-  // Récupérer les marques avec comptage
-  const brands = await prisma.brand.findMany({
-    include: { _count: { select: { products: true } } },
-    orderBy: { name: "asc" },
-  }) as BrandWithCount[];
+  // Récupérer catégories et marques en parallèle
+  const [categories, brands] = await Promise.all([
+    prisma.category.findMany({
+      include: { _count: { select: { products: true } } },
+      orderBy: { name: "asc" },
+    }) as Promise<CategoryWithCount[]>,
+    prisma.brand.findMany({
+      include: { _count: { select: { products: true } } },
+      orderBy: { name: "asc" },
+    }) as Promise<BrandWithCount[]>,
+  ]);
 
   // Construire la clause WHERE
   const whereClause: Record<string, unknown> = { active: true };
@@ -185,7 +183,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
           ) : (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} canSeePrices={canSeePrices} />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}
@@ -199,14 +197,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
    PRODUCT CARD
    =================================================================== */
 
-function ProductCard({ product, canSeePrices }: { product: ProductWithRelations; canSeePrices: boolean }) {
-  // Calculer le prix minimum parmi les variantes avec un prix > 0
-  const pricesAboveZero = product.variants
-    .map(v => v.catalogPriceHT)
-    .filter(p => p > 0);
-  const minPrice = pricesAboveZero.length > 0 ? Math.min(...pricesAboveZero) : null;
-  const hasNoPricing = pricesAboveZero.length === 0;
-  
+function ProductCard({ product }: { product: ProductWithRelations }) {
   const color = product.category?.color || "#283084";
 
   return (
@@ -217,10 +208,12 @@ function ProductCard({ product, canSeePrices }: { product: ProductWithRelations;
       {/* Image */}
       <div className="aspect-[4/3] bg-surface-dark flex items-center justify-center p-6 relative">
         {product.image ? (
-          <img
+          <Image
             src={product.image.url}
             alt={product.image.alt}
-            className="w-full h-full object-contain"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-contain p-6"
           />
         ) : (
           <span className="text-6xl opacity-30">📦</span>
@@ -249,24 +242,9 @@ function ProductCard({ product, canSeePrices }: { product: ProductWithRelations;
         </h3>
 
         <div className="flex items-end justify-between">
-          {!canSeePrices ? (
-            <span className="text-xs text-primary font-medium">
-              Connectez-vous pour voir les prix
-            </span>
-          ) : hasNoPricing ? (
-            <span className="text-xs text-text-secondary font-medium">
-              Prix sur demande
-            </span>
-          ) : (
-            <div>
-              <span className="text-xs text-text-secondary">À partir de</span>
-              <div className="text-lg font-bold text-primary">
-                {minPrice!.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}&nbsp;€
-                <span className="text-xs font-normal text-text-secondary ml-1">HT</span>
-              </div>
-            </div>
-          )}
-
+          <span className="text-xs text-primary font-medium">
+            Connectez-vous pour voir les prix
+          </span>
           <span className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
             Détails →
           </span>

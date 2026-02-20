@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120; // ISR: revalider toutes les 2 min
 
 export const metadata = {
   title: "Nos marques | Francilienne Energy",
@@ -65,10 +66,12 @@ export default async function MarquesPage() {
                   className="group bg-white rounded-xl shadow-sm border border-border p-6 hover:shadow-md transition-all hover:-translate-y-0.5"
                 >
                   <div className="aspect-[3/2] relative mb-4 flex items-center justify-center bg-surface rounded-lg p-4">
-                    <img
+                    <Image
                       src={brand.logoUrl!}
                       alt={brand.name}
-                      className="max-w-full max-h-full object-contain"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="object-contain p-4"
                     />
                   </div>
                   <div className="text-center">

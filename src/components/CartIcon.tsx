@@ -12,12 +12,11 @@ export default function CartIcon() {
     if (isAuthenticated.current === false) return;
 
     try {
-      const res = await fetch("/api/cart");
+      const res = await fetch("/api/cart/count");
       if (res.ok) {
         isAuthenticated.current = true;
         const data = await res.json();
-        const total = data.items?.reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0) || 0;
-        setCartCount(total);
+        setCartCount(data.count || 0);
       } else if (res.status === 401 || res.status === 403) {
         // Non connecté ou pas ACTIVE — arrêter le polling
         isAuthenticated.current = false;

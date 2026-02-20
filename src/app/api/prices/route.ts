@@ -1,35 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser, requireAdmin } from '@/lib/auth';
-
-/**
- * Calcule le prix final pour un client ACTIF.
- */
-async function calculatePrice(
-  variantId: string,
-  customerId: string | null
-): Promise<number> {
-  const variant = await prisma.productVariant.findUnique({
-    where: { id: variantId },
-    select: { catalogPriceHT: true },
-  });
-
-  if (!variant) throw new Error('Variante introuvable');
-  if (!customerId) return variant.catalogPriceHT;
-
-  const customerPrice = await prisma.customerPrice.findUnique({
-    where: { customerId_variantId: { customerId, variantId } },
-  });
-
-  if (!customerPrice) return variant.catalogPriceHT;
-
-  const now = new Date();
-  if (customerPrice.startDate && customerPrice.startDate > now) return variant.catalogPriceHT;
-  if (customerPrice.endDate && customerPrice.endDate < now) return variant.catalogPriceHT;
-
-  if (customerPrice.type === 'FIXED') return customerPrice.value;
-  return variant.catalogPriceHT * (1 - customerPrice.value / 100);
-}
+import { calculatePrice } from '@/lib/pricing';
 
 /**
  * GET /api/prices?variantId=xxx

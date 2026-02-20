@@ -14,7 +14,9 @@ export async function GET() {
       orderBy: { name: 'asc' },
     });
 
-    return NextResponse.json({ brands });
+    return NextResponse.json({ brands }, {
+      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+    });
   } catch (error) {
     console.error('Erreur récupération marques:', error);
     return NextResponse.json(
