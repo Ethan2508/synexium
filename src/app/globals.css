@@ -57,3 +57,17 @@ a {
   background: var(--color-primary-light);
   border-radius: 4px;
 }
+
+/* ===== Carousel scroll animation ===== */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-scroll {
+  animation: scroll 30s linear infinite;
+}

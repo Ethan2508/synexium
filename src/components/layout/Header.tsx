@@ -256,14 +256,6 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-primary text-white shadow-lg">
-      {/* Top bar */}
-      <div className="bg-primary-dark text-xs text-white/70 hidden md:block">
-        <div className="max-w-7xl mx-auto px-6 py-1.5 flex justify-between">
-          <span>Distributeur B2B - Installateurs et bureaux d&apos;études</span>
-          <span>Lun-Ven 8h30-18h | 04 72 68 72 38</span>
-        </div>
-      </div>
-
       {/* Main nav */}
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
