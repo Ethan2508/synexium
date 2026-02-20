@@ -17,6 +17,7 @@ export type AuthUser = {
   idCardFrontUrl: string | null;
   idCardBackUrl: string | null;
   rejectedReason: string | null;
+  cgvAcceptedAt: Date | null;
 };
 
 /**
@@ -54,6 +55,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
       idCardFrontUrl: dbUser.idCardFrontUrl,
       idCardBackUrl: dbUser.idCardBackUrl,
       rejectedReason: dbUser.rejectedReason,
+      cgvAcceptedAt: dbUser.cgvAcceptedAt,
     };
   } catch {
     return null;

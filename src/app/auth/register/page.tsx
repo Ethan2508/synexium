@@ -202,6 +202,7 @@ export default function RegisterPage() {
                     city: company.city || "",
                     codeApe: company.naf || "",
                     activity: company.nafLabel || "",
+                    tvaNumber: company.tvaNumber || "",
                   });
                 }}
                 placeholder="Tapez le nom ou le SIRET de votre entreprise..."

@@ -11,6 +11,7 @@ interface Company {
   city: string | null;
   naf: string | null;
   nafLabel: string | null;
+  tvaNumber: string | null;
   isActive: boolean;
 }
 

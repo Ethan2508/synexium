@@ -48,6 +48,16 @@ export async function GET(request: NextRequest) {
         .filter(Boolean)
         .join(" ");
 
+      // Calcul du numéro de TVA intracommunautaire français
+      // Formule : FR + clé + SIREN, où clé = (12 + 3 × (SIREN % 97)) % 97
+      const siren = company.siren;
+      let tvaNumber: string | null = null;
+      if (siren && /^\d{9}$/.test(siren)) {
+        const sirenNum = parseInt(siren, 10);
+        const key = (12 + 3 * (sirenNum % 97)) % 97;
+        tvaNumber = `FR${String(key).padStart(2, "0")}${siren}`;
+      }
+
       return {
         siret: siege.siret || company.siren + "00000",
         siren: company.siren,
@@ -57,6 +67,7 @@ export async function GET(request: NextRequest) {
         city: siege.libelle_commune || null,
         naf: company.activite_principale || null,
         nafLabel: company.libelle_activite_principale || null,
+        tvaNumber,
         legalForm: company.nature_juridique || null,
         createdAt: company.date_creation || null,
         isActive: company.etat_administratif === "A",

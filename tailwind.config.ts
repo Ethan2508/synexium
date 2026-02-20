@@ -34,6 +34,15 @@ const config: Config = {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "monospace"],
       },
+      animation: {
+        scroll: "scroll 30s linear infinite",
+      },
+      keyframes: {
+        scroll: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
     },
   },
   plugins: [],

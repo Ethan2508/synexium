@@ -279,16 +279,22 @@ export default function AdminClientDetailPage() {
         )}
 
         {/* Actions rapides */}
-        {client.status === "ACTIVE" && (
-          <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          {client.status === "ACTIVE" && (
             <Link
               href={`/admin/prix?client=${client.id}`}
               className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-dark transition"
             >
               Gérer les prix personnalisés
             </Link>
-          </div>
-        )}
+          )}
+          <a
+            href={`mailto:${client.email}?subject=${encodeURIComponent(`Demande de rectification – ${client.company}`)}&body=${encodeURIComponent(`Bonjour ${client.firstName} ${client.lastName},\n\nAprès vérification de votre dossier d'inscription, nous vous demandons de bien vouloir rectifier les éléments suivants :\n\n- \n\nMerci de nous renvoyer les documents corrigés dès que possible.\n\nCordialement,\nL'équipe Francilienne Energy`)}`}
+            className="px-6 py-3 bg-solar-yellow text-white font-bold rounded-lg hover:opacity-90 transition flex items-center gap-2"
+          >
+            ✉️ Demande de rectification
+          </a>
+        </div>
       </div>
     </div>
   );

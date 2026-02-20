@@ -213,17 +213,43 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── Marques ── */}
-      <section className="bg-white py-16 lg:py-20">
+      {/* ── Marques partenaires (logos défilants) ── */}
+      <section className="bg-white py-16 lg:py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-text-primary text-center mb-10">
             Nos marques partenaires
           </h2>
-          <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-16 opacity-70">
-            {["Enphase", "Hoymiles", "Huawei", "K2 Systems", "GSE", "Panasonic", "Airwell", "Solplanet"].map((brand) => (
-              <span key={brand} className="text-lg font-semibold text-gray-500">
-                {brand}
-              </span>
+        </div>
+        <div className="relative">
+          <div className="flex animate-scroll gap-12 items-center">
+            {[
+              { name: "Airwell", logo: "/brands/airwell.png" },
+              { name: "AP Systems", logo: "/brands/apsystems.png" },
+              { name: "Ariston", logo: "/brands/ariston.png" },
+              { name: "Atlantic", logo: "/brands/atlantic.png" },
+              { name: "Axelair", logo: "/brands/axelair.png" },
+              { name: "Chaffoteaux", logo: "/brands/chaffoteaux.png" },
+              { name: "Domusa", logo: "/brands/domusa.png" },
+              { name: "Eaton", logo: "/brands/eaton.png" },
+              // Doublé pour boucle infinie
+              { name: "Airwell", logo: "/brands/airwell.png" },
+              { name: "AP Systems", logo: "/brands/apsystems.png" },
+              { name: "Ariston", logo: "/brands/ariston.png" },
+              { name: "Atlantic", logo: "/brands/atlantic.png" },
+              { name: "Axelair", logo: "/brands/axelair.png" },
+              { name: "Chaffoteaux", logo: "/brands/chaffoteaux.png" },
+              { name: "Domusa", logo: "/brands/domusa.png" },
+              { name: "Eaton", logo: "/brands/eaton.png" },
+            ].map((brand, i) => (
+              <div key={`${brand.name}-${i}`} className="shrink-0 px-4">
+                <Image
+                  src={brand.logo}
+                  alt={brand.name}
+                  width={120}
+                  height={60}
+                  className="h-12 w-auto object-contain grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100"
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -325,10 +351,10 @@ function CategoryCard({
   return (
     <Link
       href={href}
-      className="group relative bg-white rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg hover:-translate-y-1 transition-all"
+      className="group relative bg-white rounded-2xl p-6 shadow-sm border border-border hover:shadow-lg hover:-translate-y-1 transition-all text-center"
     >
       <div
-        className="w-14 h-14 rounded-xl flex items-center justify-center mb-4"
+        className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 mx-auto"
         style={{ backgroundColor: `${color}15` }}
       >
         <div style={{ color }}>{icon}</div>
@@ -336,7 +362,7 @@ function CategoryCard({
       <h3 className="text-lg font-bold text-text-primary mb-2">{title}</h3>
       <p className="text-sm text-text-secondary leading-relaxed mb-4">{description}</p>
       <span
-        className="inline-flex items-center gap-1 text-sm font-semibold transition-colors"
+        className="inline-flex items-center gap-1 text-sm font-semibold transition-colors mx-auto"
         style={{ color }}
       >
         Voir les produits
