@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import CartIcon from "@/components/CartIcon";
+import UserGreeting from "@/components/UserGreeting";
 
 /* ==========================================================================
    MEGA MENU DATA - Catégories de produits
@@ -11,7 +12,7 @@ import CartIcon from "@/components/CartIcon";
 
 const MENU_CATEGORIES = [
   {
-    title: "Photovoltaïque",
+    title: "Solaire",
     slug: "photovoltaique",
     color: "#7fb727",
     sections: [
@@ -34,37 +35,32 @@ const MENU_CATEGORIES = [
       {
         title: "Stockage",
         links: [
-          { label: "Batteries Huawei", href: "/catalogue?family=STOCKAGE+HUAWEI" },
-          { label: "Batteries Hoymiles", href: "/catalogue?family=STOCKAGE+HOYMILES" },
-          { label: "Batteries Solplanet", href: "/catalogue?search=batterie+solplanet" },
+          { label: "Huawei", href: "/catalogue?family=STOCKAGE+HUAWEI" },
+          { label: "Hoymiles", href: "/catalogue?family=STOCKAGE+HOYMILES" },
+          { label: "Solplanet", href: "/catalogue?search=stockage+solplanet" },
+        ],
+      },
+      {
+        title: "Intégration & Fixation",
+        links: [
+          { label: "Structures K2 Systems", href: "/catalogue?family=K2+ET+ACIER" },
+          { label: "Intégration Francilienne", href: "/catalogue?family=INTEGRATION+FRANCILIENNE" },
+          { label: "GSE In-Roof", href: "/catalogue?family=COMPOSANTS+GSE+INROOF" },
+          { label: "Carports solaires", href: "/catalogue?family=CARPORT" },
+          { label: "Boîtiers AC/DC", href: "/catalogue?family=BOITIERS+AC+ET+DC" },
         ],
       },
     ],
   },
   {
-    title: "Intégration & Fixation",
-    slug: "integration",
-    color: "#555",
+    title: "ECS",
+    slug: "ecs",
+    color: "#009fe3",
     sections: [
       {
-        title: "Surimposition",
+        title: "Eau Chaude Sanitaire",
         links: [
-          { label: "Structures K2 Systems", href: "/catalogue?family=K2+ET+ACIER" },
-          { label: "Intégration Francilienne", href: "/catalogue?family=INTEGRATION+FRANCILIENNE" },
-        ],
-      },
-      {
-        title: "Intégration toiture",
-        links: [
-          { label: "GSE In-Roof", href: "/catalogue?family=COMPOSANTS+GSE+INROOF" },
-          { label: "GSE Ground System", href: "/catalogue?family=COMPOSANTS+GSE+GROUNDSYSTEM" },
-        ],
-      },
-      {
-        title: "Autres",
-        links: [
-          { label: "Carports solaires", href: "/catalogue?family=CARPORT" },
-          { label: "Boîtiers AC/DC", href: "/catalogue?family=BOITIERS+AC+ET+DC" },
+          { label: "Ballons thermodynamiques", href: "/catalogue?family=BALLONS" },
         ],
       },
     ],
@@ -88,18 +84,12 @@ const MENU_CATEGORIES = [
           { label: "Airwell HDL", href: "/catalogue?search=airwell+hdl" },
         ],
       },
-      {
-        title: "Eau chaude sanitaire",
-        links: [
-          { label: "Ballons thermodynamiques", href: "/catalogue?family=BALLONS" },
-        ],
-      },
     ],
   },
   {
     title: "Accessoires & Câblage",
     slug: "accessoires",
-    color: "#009fe3",
+    color: "#555",
     sections: [
       {
         title: "Câbles",
@@ -121,6 +111,7 @@ const MENU_CATEGORIES = [
           { label: "Accessoires PAC", href: "/catalogue?family=PAC+ACCESSOIRES" },
           { label: "Bornes de recharge", href: "/catalogue?family=EV+CHARGER+KEBA" },
           { label: "Domotique", href: "/catalogue?family=DOMOTIQUE" },
+          { label: "GSE Ground System", href: "/catalogue?family=COMPOSANTS+GSE+GROUNDSYSTEM" },
         ],
       },
     ],
@@ -486,6 +477,9 @@ export default function Header() {
             >
               <SearchIcon />
             </button>
+
+            {/* Greeting */}
+            <UserGreeting />
 
             {/* Cart */}
             <CartIcon />

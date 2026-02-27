@@ -9,7 +9,7 @@ export const revalidate = 60; // ISR: revalider toutes les 60s
    ========================================================================= */
 
 interface CataloguePageProps {
-  searchParams: Promise<{ category?: string; brand?: string; search?: string; family?: string }>;
+  searchParams: Promise<{ category?: string; brand?: string; search?: string; family?: string; power?: string }>;
 }
 
 type CategoryWithCount = {
@@ -34,14 +34,14 @@ type ProductWithRelations = {
   category: { id: string; name: string; slug: string; color: string } | null;
   brand: { id: string; name: string; slug: string } | null;
   image: { url: string; alt: string } | null;
-  variants: Array<{ id: string; catalogPriceHT: number }>;
+  variants: Array<{ id: string; catalogPriceHT: number; powerKw: number | null }>;
 };
 
 export default async function CataloguePage({ searchParams }: CataloguePageProps) {
-  const { category, brand, search, family } = await searchParams;
+  const { category, brand, search, family, power } = await searchParams;
 
-  // Récupérer catégories et marques en parallèle
-  const [categories, brands] = await Promise.all([
+  // Récupérer catégories, marques et puissances disponibles en parallèle
+  const [categories, brands, powerValues] = await Promise.all([
     prisma.category.findMany({
       include: { _count: { select: { products: true } } },
       orderBy: { name: "asc" },
@@ -50,6 +50,12 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
       include: { _count: { select: { products: true } } },
       orderBy: { name: "asc" },
     }) as Promise<BrandWithCount[]>,
+    prisma.productVariant.findMany({
+      where: { active: true, powerKw: { not: null } },
+      select: { powerKw: true },
+      distinct: ["powerKw"],
+      orderBy: { powerKw: "asc" },
+    }).then((rows) => rows.map((r) => r.powerKw!).filter(Boolean)),
   ]);
 
   // Construire la clause WHERE
@@ -57,6 +63,12 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
   if (category) whereClause.category = { slug: category };
   if (brand) whereClause.brand = { slug: brand };
   if (family) whereClause.family = { contains: family, mode: "insensitive" };
+  if (power) {
+    const powerNum = parseFloat(power);
+    if (!isNaN(powerNum)) {
+      whereClause.variants = { some: { active: true, powerKw: powerNum } };
+    }
+  }
   if (search) {
     whereClause.OR = [
       { name: { contains: search, mode: "insensitive" } },
@@ -71,7 +83,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
     include: {
       category: true,
       brand: true,
-      variants: { where: { active: true }, orderBy: { catalogPriceHT: "asc" }, take: 1 },
+      variants: { where: { active: true }, orderBy: { catalogPriceHT: "asc" }, take: 1, select: { id: true, catalogPriceHT: true, powerKw: true } },
       image: true,
     },
     orderBy: { name: "asc" },
@@ -170,6 +182,31 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
               ))}
             </ul>
           </div>
+
+          {/* Puissances */}
+          {powerValues.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-border p-5">
+              <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4">
+                Puissance
+              </h3>
+              <ul className="space-y-1 max-h-48 overflow-y-auto">
+                {powerValues.map((p) => (
+                  <li key={p}>
+                    <Link
+                      href={`/catalogue?power=${p}${category ? `&category=${category}` : ""}${brand ? `&brand=${brand}` : ""}`}
+                      className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        power === String(p)
+                          ? "bg-primary !text-white"
+                          : "text-text-secondary hover:bg-surface"
+                      }`}
+                    >
+                      {p} kW
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </aside>
 
         {/* ── Grille produits ── */}
@@ -199,6 +236,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
 
 function ProductCard({ product }: { product: ProductWithRelations }) {
   const color = product.category?.color || "#283084";
+  const mainPower = product.variants[0]?.powerKw;
 
   return (
     <Link
@@ -240,6 +278,14 @@ function ProductCard({ product }: { product: ProductWithRelations }) {
         <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-2 mb-3 group-hover:text-primary transition-colors">
           {product.name}
         </h3>
+
+        {mainPower && (
+          <div className="mb-2">
+            <span className="inline-block px-2 py-0.5 rounded text-xs font-bold bg-solar-green/10 text-solar-green">
+              {mainPower} kW
+            </span>
+          </div>
+        )}
 
         <div className="flex items-end justify-between">
           <span className="text-xs text-primary font-medium">

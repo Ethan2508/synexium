@@ -42,6 +42,7 @@ export async function GET() {
           capacity: item.variant.capacity,
           realStock: item.variant.realStock,
           catalogPriceHT: item.variant.catalogPriceHT,
+          unitsPerPalette: item.variant.unitsPerPalette,
         },
         product: item.variant.product,
         unitPriceHT: unitPrice,

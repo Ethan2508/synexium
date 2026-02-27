@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface AddToCartButtonProps {
@@ -15,7 +15,51 @@ export default function AddToCartButton({ variantId, stock }: AddToCartButtonPro
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Stock alert state
+  const [hasAlert, setHasAlert] = useState(false);
+  const [alertLoading, setAlertLoading] = useState(false);
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
+
   const outOfStock = stock <= 0;
+
+  // Vérifier si une alerte existe déjà pour cette variante
+  useEffect(() => {
+    if (!outOfStock) return;
+    fetch(`/api/stock-alerts?variantId=${variantId}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.hasAlert) setHasAlert(true);
+      })
+      .catch(() => {});
+  }, [variantId, outOfStock]);
+
+  async function handleStockAlert() {
+    setAlertLoading(true);
+    setAlertMsg(null);
+    try {
+      if (hasAlert) {
+        await fetch(`/api/stock-alerts?variantId=${variantId}`, { method: "DELETE" });
+        setHasAlert(false);
+        setAlertMsg("Alerte désactivée.");
+      } else {
+        const res = await fetch("/api/stock-alerts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ variantId }),
+        });
+        if (res.status === 401) {
+          router.push("/auth/login?redirect=" + encodeURIComponent(window.location.pathname));
+          return;
+        }
+        setHasAlert(true);
+        setAlertMsg("Vous serez prévenu par email !");
+      }
+    } catch {
+      setAlertMsg("Erreur, réessayez.");
+    } finally {
+      setAlertLoading(false);
+    }
+  }
 
   async function handleAddToCart() {
     if (outOfStock || loading) return;
@@ -47,9 +91,24 @@ export default function AddToCartButton({ variantId, stock }: AddToCartButtonPro
 
   if (outOfStock) {
     return (
-      <span className="shrink-0 px-4 py-2.5 text-xs font-semibold text-heatpump-red border border-heatpump-red/30 rounded-lg">
-        Rupture de stock
-      </span>
+      <div className="flex items-center gap-2 shrink-0">
+        <span className="px-4 py-2.5 text-xs font-semibold text-heatpump-red border border-heatpump-red/30 rounded-lg">
+          Rupture de stock
+        </span>
+        <button
+          type="button"
+          onClick={handleStockAlert}
+          disabled={alertLoading}
+          className={`px-4 py-2.5 text-xs font-semibold rounded-lg transition-colors ${
+            hasAlert
+              ? "bg-solar-green/10 text-solar-green border border-solar-green/30 hover:bg-heatpump-red/10 hover:text-heatpump-red hover:border-heatpump-red/30"
+              : "bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20"
+          } disabled:opacity-50`}
+        >
+          {alertLoading ? "…" : hasAlert ? "✓ Alerte activée" : "🔔 M'alerter"}
+        </button>
+        {alertMsg && <span className="text-xs text-text-secondary">{alertMsg}</span>}
+      </div>
     );
   }
 

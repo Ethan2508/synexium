@@ -11,7 +11,7 @@ export const revalidate = 60; // ISR: revalider toutes les 60s
 export default async function Home() {
   const featuredProducts = await prisma.product.findMany({
     where: { active: true },
-    take: 8,
+    take: 4,
     include: {
       brand: true,
       category: true,
@@ -70,7 +70,7 @@ export default async function Home() {
             {/* Right: Stats cards */}
             <div className="hidden lg:grid grid-cols-2 gap-4">
               <StatCard value="650+" label="Références produits" />
-              <StatCard value="24h" label="Livraison IDF" />
+              <StatCard value="24h" label="Livraison" />
               <StatCard value="100%" label="Stock temps réel" />
               <StatCard value="15+" label="Marques partenaires" />
             </div>
@@ -82,51 +82,6 @@ export default async function Home() {
           <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
             <path d="M0 50L48 45.8C96 41.7 192 33.3 288 35.8C384 38.3 480 51.7 576 55.8C672 60 768 55 864 48.3C960 41.7 1056 33.3 1152 35.8C1248 38.3 1344 51.7 1392 58.3L1440 65V100H1392C1344 100 1248 100 1152 100C1056 100 960 100 864 100C768 100 672 100 576 100C480 100 384 100 288 100C192 100 96 100 48 100H0V50Z" fill="#f8fafc"/>
           </svg>
-        </div>
-      </section>
-
-      {/* ── Catégories ── */}
-      <section className="bg-surface py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-              Nos univers produits
-            </h2>
-            <p className="text-text-secondary max-w-xl mx-auto">
-              Matériel professionnel disponible sur stock, accompagnement technique sur vos projets
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <CategoryCard
-              title="Photovoltaïque"
-              description="Panneaux, onduleurs, micro-onduleurs, batteries et accessoires"
-              color="#7fb727"
-              href="/catalogue?category=photovoltaique"
-              icon={<SolarIcon />}
-            />
-            <CategoryCard
-              title="Intégration"
-              description="Structures K2, GSE, surimposition et intégration toiture"
-              color="#555"
-              href="/catalogue?category=integration"
-              icon={<StructureIcon />}
-            />
-            <CategoryCard
-              title="Chauffage"
-              description="PAC air-eau, air-air, ballons thermodynamiques, accessoires"
-              color="#e6332a"
-              href="/catalogue?category=chauffage"
-              icon={<HeatIcon />}
-            />
-            <CategoryCard
-              title="Accessoires"
-              description="Câbles, protections, connectiques, boîtiers AC/DC"
-              color="#009fe3"
-              href="/catalogue?category=accessoires"
-              icon={<AccessoryIcon />}
-            />
-          </div>
         </div>
       </section>
 
@@ -192,6 +147,51 @@ export default async function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Catégories ── */}
+      <section className="bg-surface py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+              Nos univers produits
+            </h2>
+            <p className="text-text-secondary max-w-xl mx-auto">
+              Matériel professionnel disponible sur stock, accompagnement technique sur vos projets
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <CategoryCard
+              title="Solaire"
+              description="Panneaux, onduleurs, micro-onduleurs, stockage et intégration toiture"
+              color="#7fb727"
+              href="/catalogue?category=photovoltaique"
+              icon={<SolarIcon />}
+            />
+            <CategoryCard
+              title="ECS"
+              description="Ballons thermodynamiques et eau chaude sanitaire"
+              color="#009fe3"
+              href="/catalogue?category=ecs"
+              icon={<WaterIcon />}
+            />
+            <CategoryCard
+              title="Chauffage"
+              description="PAC air-eau, air-air, accessoires chauffage"
+              color="#e6332a"
+              href="/catalogue?category=chauffage"
+              icon={<HeatIcon />}
+            />
+            <CategoryCard
+              title="Accessoires"
+              description="Câbles, protections, connectiques, boîtiers AC/DC"
+              color="#555"
+              href="/catalogue?category=accessoires"
+              icon={<AccessoryIcon />}
+            />
           </div>
         </div>
       </section>
@@ -382,6 +382,13 @@ function SolarIcon() {
   return (
     <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+    </svg>
+  );
+}
+function WaterIcon() {
+  return (
+    <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a8.25 8.25 0 006.222-2.808A5.973 5.973 0 0012 15.75a5.973 5.973 0 00-6.222 2.442A8.25 8.25 0 0012 21zm0 0a8.966 8.966 0 005.314-3.424M12 21a8.966 8.966 0 01-5.314-3.424M15.75 9a3.75 3.75 0 11-7.5 0c0-3.75 3.75-7.5 3.75-7.5S15.75 5.25 15.75 9z" />
     </svg>
   );
 }

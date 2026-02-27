@@ -21,6 +21,7 @@ type Variant = {
   powerKw: number | null;
   capacity: number | null;
   designation: string;
+  supplierReference: string | null;
   realStock: number;
   catalogPriceHT: number;
 };
@@ -48,7 +49,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     include: {
       category: true,
       brand: true,
-      variants: { where: { active: true }, orderBy: [{ powerKw: "asc" }, { capacity: "asc" }] },
+      variants: { where: { active: true }, orderBy: [{ powerKw: "asc" }, { capacity: "asc" }], select: { id: true, sku: true, powerKw: true, capacity: true, designation: true, supplierReference: true, realStock: true, catalogPriceHT: true } },
       image: true,
       documents: { include: { document: true } },
     },
@@ -147,9 +148,40 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </h1>
 
           {product.description && (
-            <p className="text-text-secondary leading-relaxed mb-8">
+            <p className="text-text-secondary leading-relaxed mb-6">
               {product.description}
             </p>
+          )}
+
+          {/* ── Documents techniques (en avant) ── */}
+          {product.documents.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden mb-6">
+              <div className="px-5 py-3 border-b border-border bg-surface">
+                <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider">
+                  Fiche technique
+                </h3>
+              </div>
+              <div className="divide-y divide-border">
+                {product.documents.map(({ document }: ProductDoc) => (
+                  <a
+                    key={document.id}
+                    href={document.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-5 py-3 hover:bg-surface transition-colors"
+                  >
+                    <PdfIcon />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm text-text-primary truncate">
+                        {document.name}
+                      </div>
+                      <div className="text-xs text-text-secondary">{document.type}</div>
+                    </div>
+                    <DownloadIcon />
+                  </a>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* ── Variantes ── */}
@@ -177,6 +209,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       <div className="text-xs text-text-secondary mt-0.5">
                         SKU : {v.sku}
                       </div>
+                      {v.supplierReference && (
+                        <div className="text-xs text-text-secondary">
+                          Réf. fournisseur : {v.supplierReference}
+                        </div>
+                      )}
                       {v.realStock > 0 ? (
                         <div className="flex items-center gap-1.5 mt-1.5">
                           <span className="w-2 h-2 rounded-full bg-solar-green" />
@@ -225,37 +262,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               ))}
             </div>
           </div>
-
-          {/* ── Documents ── */}
-          {product.documents.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
-              <div className="px-5 py-4 border-b border-border bg-surface">
-                <h3 className="font-bold text-text-primary text-sm uppercase tracking-wider">
-                  Documents techniques
-                </h3>
-              </div>
-              <div className="divide-y divide-border">
-                {product.documents.map(({ document }: ProductDoc) => (
-                  <a
-                    key={document.id}
-                    href={document.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-5 py-3 hover:bg-surface transition-colors"
-                  >
-                    <PdfIcon />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-text-primary truncate">
-                        {document.name}
-                      </div>
-                      <div className="text-xs text-text-secondary">{document.type}</div>
-                    </div>
-                    <DownloadIcon />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

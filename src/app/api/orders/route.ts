@@ -3,16 +3,25 @@ import { prisma } from "@/lib/prisma";
 import { requireActiveUser, getAuthUser } from "@/lib/auth";
 import { sendOrderConfirmationEmail, sendNewOrderNotification } from "@/lib/email";
 import { calculatePricesBatch } from "@/lib/pricing";
+import { Prisma } from "@prisma/client";
 
 /**
- * Génère une référence de commande unique
+ * Génère une référence PL-WEB-YYYY-XXXX séquentielle par année.
+ * Doit être appelée à l'intérieur d'une transaction Prisma.
  */
-function generateOrderReference(): string {
-  const date = new Date();
-  const year = date.getFullYear().toString().slice(-2);
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `FE${year}${month}-${random}`;
+async function generateOrderReference(
+  tx: Prisma.TransactionClient
+): Promise<string> {
+  const year = new Date().getFullYear();
+
+  // Upsert atomique : crée ou incrémente le compteur pour l'année
+  const counter = await tx.orderCounter.upsert({
+    where: { year },
+    update: { seq: { increment: 1 } },
+    create: { year, seq: 1 },
+  });
+
+  return `PL-WEB-${year}-${counter.seq.toString().padStart(4, "0")}`;
 }
 
 /**
@@ -116,10 +125,13 @@ export async function POST(request: NextRequest) {
 
     // Créer la commande dans une transaction
     const order = await prisma.$transaction(async (tx) => {
+      // Générer la référence séquentielle
+      const reference = await generateOrderReference(tx);
+
       // Créer la commande
       const newOrder = await tx.order.create({
         data: {
-          reference: generateOrderReference(),
+          reference,
           customerId: user.id,
           status: "SUBMITTED",
           totalHT,

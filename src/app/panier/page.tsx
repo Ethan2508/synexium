@@ -15,6 +15,7 @@ type CartItem = {
     powerKw: number | null;
     capacity: number | null;
     realStock: number;
+    unitsPerPalette: number | null;
   };
   product: {
     id: string;
@@ -236,6 +237,25 @@ export default function PanierPage() {
                     >
                       +
                     </button>
+
+                    {item.variant.unitsPerPalette && item.variant.unitsPerPalette > 1 && (
+                      <button
+                        onClick={() =>
+                          updateQuantity(
+                            item.variant.id,
+                            item.quantity % item.variant.unitsPerPalette! === 0
+                              ? item.quantity + item.variant.unitsPerPalette!
+                              : Math.ceil(item.quantity / item.variant.unitsPerPalette!) * item.variant.unitsPerPalette!
+                          )
+                        }
+                        disabled={updating === item.variant.id}
+                        className="ml-2 px-3 py-1 text-xs font-semibold rounded-lg border border-primary/30 text-primary bg-primary/5 hover:bg-primary/10 transition-colors disabled:opacity-50"
+                        title={`1 palette = ${item.variant.unitsPerPalette} pcs`}
+                      >
+                        🔲 Palette ({item.variant.unitsPerPalette} pcs)
+                      </button>
+                    )}
+
                     <button
                       onClick={() => removeItem(item.variant.id)}
                       disabled={updating === item.variant.id}

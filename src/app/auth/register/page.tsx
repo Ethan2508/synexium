@@ -42,6 +42,7 @@ export default function RegisterPage() {
   const [kbis, setKbis] = useState<File | null>(null);
   const [idFront, setIdFront] = useState<File | null>(null);
   const [idBack, setIdBack] = useState<File | null>(null);
+  const [capacityCert, setCapacityCert] = useState<File | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -105,6 +106,7 @@ export default function RegisterPage() {
       fd.append("kbis", kbis);
       if (idFront) fd.append("idFront", idFront);
       if (idBack) fd.append("idBack", idBack);
+      if (capacityCert) fd.append("capacityCert", capacityCert);
 
       const res = await fetch("/api/auth/upload-docs", {
         method: "POST",
@@ -341,6 +343,13 @@ export default function RegisterPage() {
               accept=".pdf,.jpg,.jpeg,.png"
               file={kbis}
               onChange={setKbis}
+            />
+
+            <FileUpload
+              label="Attestation de capacité (obligatoire si PAC)"
+              accept=".pdf,.jpg,.jpeg,.png"
+              file={capacityCert}
+              onChange={setCapacityCert}
             />
 
             <FileUpload

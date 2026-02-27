@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     const kbis = formData.get("kbis") as File | null;
     const idFront = formData.get("idFront") as File | null;
     const idBack = formData.get("idBack") as File | null;
+    const capacityCert = formData.get("capacityCert") as File | null;
 
     if (!kbis && !idFront) {
       return NextResponse.json(
@@ -66,6 +67,19 @@ export async function POST(request: NextRequest) {
 
       const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
       updates.idCardBackUrl = urlData.publicUrl;
+    }
+
+    // Upload attestation de capacité
+    if (capacityCert) {
+      const ext = capacityCert.name.split(".").pop();
+      const path = `capacity/${user.id}/attestation.${ext}`;
+      const { error } = await supabase.storage
+        .from("documents")
+        .upload(path, capacityCert, { upsert: true });
+      if (error) throw new Error(`Upload attestation échoué: ${error.message}`);
+
+      const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
+      updates.capacityCertificateUrl = urlData.publicUrl;
     }
 
     // Mise à jour Prisma

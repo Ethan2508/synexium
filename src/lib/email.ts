@@ -235,3 +235,39 @@ export async function sendNewOrderNotification(
     console.error("Erreur envoi notification commande:", error);
   }
 }
+
+/**
+ * Email d'alerte stock : produit de nouveau disponible
+ */
+export async function sendStockAlertEmail(
+  to: string,
+  firstName: string,
+  productName: string,
+  productSlug: string
+) {
+  if (!isEmailEnabled()) return;
+  try {
+    await getResend().emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject: `${productName} est de nouveau disponible !`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #1a1a2e;">Bonne nouvelle, ${firstName} !</h2>
+          <p>Le produit <strong>${productName}</strong> que vous surveilliez est de nouveau en stock.</p>
+          <br />
+          <a href="https://synexium.vercel.app/produits/${productSlug}" 
+             style="display: inline-block; background: #7fb727; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+            Voir le produit
+          </a>
+          <br /><br />
+          <p style="color: #666; font-size: 14px;">
+            Vous recevez cet email car vous avez activé une alerte de stock sur notre boutique.
+          </p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Erreur envoi alerte stock:", error);
+  }
+}

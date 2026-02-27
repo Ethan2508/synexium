@@ -5,8 +5,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── Utilisateurs ───
@@ -38,6 +39,7 @@ model User {
   iban                  String?
   bic                   String?
   kbisUrl               String?
+  capacityCertificateUrl String?       // Attestation de capacité (obligatoire si PAC)
   idCardFrontUrl        String?
   idCardBackUrl         String?
   role                  String          @default("CLIENT")
@@ -49,6 +51,7 @@ model User {
   orders                Order[]
   customerPrices        CustomerPrice[]
   cartItems             CartItem[]
+  stockAlerts           StockAlert[]
 
   @@index([email])
   @@index([supabaseId])
@@ -138,6 +141,7 @@ model ProductVariant {
   powerKw             Float?
   capacity            Float?
   supplierReference   String?         // Référence fournisseur (ex: DPR0025)
+  unitsPerPalette     Int?            // Nombre d'unités par palette (ex: 36)
   realStock           Float           @default(0)
   catalogPriceHT      Float           @default(0)
   active              Boolean         @default(true)
@@ -151,6 +155,7 @@ model ProductVariant {
   orderItems          OrderItem[]
   cartItems           CartItem[]
   attributes          VariantAttribute[]
+  stockAlerts         StockAlert[]
 
   @@index([productId])
   @@index([supplierId])
@@ -319,6 +324,30 @@ model CartItem {
 
   @@unique([userId, variantId])
   @@index([userId])
+}
+
+// ─── Alertes Stock ───
+
+model StockAlert {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  notified  Boolean        @default(false)
+  createdAt DateTime       @default(now())
+
+  @@unique([userId, variantId])
+  @@index([variantId])
+  @@index([notified])
+}
+
+// ─── Compteur séquentiel commandes ───
+
+model OrderCounter {
+  id    String @id @default(cuid())
+  year  Int    @unique
+  seq   Int    @default(0)
 }
 
 // ─── Logs Admin ───
