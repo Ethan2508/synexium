@@ -18,14 +18,14 @@ import { prisma } from "./prisma";
 // ═══════════════════════════════════════════════════════════════════════════
 
 const FAMILY_TO_CATEGORY: Record<string, string> = {
-  "AP SYSTEM": "Solaire",
-  ENPHASE: "Solaire",
-  HOYMILES: "Solaire",
-  "ONDULEURS HOYMILES": "Solaire",
-  "ONDULEURS HUAWEI": "Solaire",
-  SOLPLANET: "Solaire",
-  "PANNEAUX FRANCILIENNE": "Solaire",
-  "DIVERS SOLAIRES": "Solaire",
+  "AP SYSTEM": "Photovoltaïque",
+  ENPHASE: "Photovoltaïque",
+  HOYMILES: "Photovoltaïque",
+  "ONDULEURS HOYMILES": "Photovoltaïque",
+  "ONDULEURS HUAWEI": "Photovoltaïque",
+  SOLPLANET: "Photovoltaïque",
+  "PANNEAUX FRANCILIENNE": "Photovoltaïque",
+  "DIVERS SOLAIRES": "Photovoltaïque",
   "STOCKAGE HUAWEI": "Stockage",
   "STOCKAGE HOYMILES": "Stockage",
   "K2 ET ACIER": "Intégration",
@@ -62,7 +62,7 @@ const SUPPLIER_CODE_TO_NAME: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Solaire: "#7fb727",
+  "Photovoltaïque": "#7fb727",
   Stockage: "#eea400",
   Intégration: "#555555",
   "Pompes à chaleur": "#e6332a",

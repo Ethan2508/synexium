@@ -12,7 +12,7 @@ import UserGreeting from "@/components/UserGreeting";
 
 const MENU_CATEGORIES = [
   {
-    title: "Solaire",
+    title: "Photovoltaïque",
     slug: "photovoltaique",
     color: "#7fb727",
     sections: [

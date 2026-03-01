@@ -48,7 +48,7 @@ export default async function Home() {
                 <span className="text-green-300">solutions énergétiques</span>
               </h1>
               <p className="text-lg lg:text-xl text-white/80 mb-8 max-w-lg">
-                Plus de 650 références en solaire, pompes à chaleur et climatisation.
+                Plus de 650 références en photovoltaïque, pompes à chaleur et climatisation.
                 Stock réel, prix négociés, livraison rapide en Île-de-France.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -165,7 +165,7 @@ export default async function Home() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <CategoryCard
-              title="Solaire"
+              title="Photovoltaïque"
               description="Panneaux, onduleurs, micro-onduleurs, stockage et intégration toiture"
               color="#7fb727"
               href="/catalogue?category=photovoltaique"

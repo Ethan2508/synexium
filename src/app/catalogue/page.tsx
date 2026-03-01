@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import FilterSection from "@/components/catalogue/FilterSection";
 
 export const revalidate = 60; // ISR: revalider toutes les 60s
 
@@ -9,7 +10,7 @@ export const revalidate = 60; // ISR: revalider toutes les 60s
    ========================================================================= */
 
 interface CataloguePageProps {
-  searchParams: Promise<{ category?: string; brand?: string; search?: string; family?: string; power?: string }>;
+  searchParams: Promise<{ category?: string; brand?: string; search?: string; family?: string; power?: string; supplier?: string; inStock?: string }>;
 }
 
 type CategoryWithCount = {
@@ -38,10 +39,10 @@ type ProductWithRelations = {
 };
 
 export default async function CataloguePage({ searchParams }: CataloguePageProps) {
-  const { category, brand, search, family, power } = await searchParams;
+  const { category, brand, search, family, power, supplier, inStock } = await searchParams;
 
-  // Récupérer catégories, marques et puissances disponibles en parallèle
-  const [categories, brands, powerValues] = await Promise.all([
+  // Récupérer catégories, marques, puissances, fournisseurs et familles en parallèle
+  const [categories, brands, powerValues, suppliers, families] = await Promise.all([
     prisma.category.findMany({
       include: { _count: { select: { products: true } } },
       orderBy: { name: "asc" },
@@ -56,6 +57,17 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
       distinct: ["powerKw"],
       orderBy: { powerKw: "asc" },
     }).then((rows) => rows.map((r) => r.powerKw!).filter(Boolean)),
+    prisma.supplier.findMany({
+      where: { active: true },
+      include: { _count: { select: { variants: true } } },
+      orderBy: { name: "asc" },
+    }),
+    prisma.product.findMany({
+      where: { active: true, family: { not: null } },
+      select: { family: true },
+      distinct: ["family"],
+      orderBy: { family: "asc" },
+    }).then((rows) => rows.map((r) => r.family!).filter(Boolean)),
   ]);
 
   // Construire la clause WHERE
@@ -63,10 +75,27 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
   if (category) whereClause.category = { slug: category };
   if (brand) whereClause.brand = { slug: brand };
   if (family) whereClause.family = { contains: family, mode: "insensitive" };
-  if (power) {
+  if (supplier) {
+    whereClause.variants = { 
+      ...((whereClause.variants as Record<string, unknown>) || {}),
+      some: { 
+        active: true, 
+        supplier: { slug: supplier },
+        ...(power ? { powerKw: parseFloat(power) } : {}),
+      } 
+    };
+  } else if (power) {
     const powerNum = parseFloat(power);
     if (!isNaN(powerNum)) {
       whereClause.variants = { some: { active: true, powerKw: powerNum } };
+    }
+  }
+  if (inStock === "1") {
+    if (whereClause.variants) {
+      const existing = (whereClause.variants as { some: Record<string, unknown> }).some;
+      (whereClause.variants as { some: Record<string, unknown> }).some = { ...existing, realStock: { gt: 0 } };
+    } else {
+      whereClause.variants = { some: { active: true, realStock: { gt: 0 } } };
     }
   }
   if (search) {
@@ -101,6 +130,25 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
     || activeBrand?.name 
     || "Tous les produits";
 
+  // Helper pour construire des liens de filtre sans perdre les autres params
+  const buildFilterUrl = (params: Record<string, string | undefined>) => {
+    const base: Record<string, string> = {};
+    if (category) base.category = category;
+    if (brand) base.brand = brand;
+    if (search) base.search = search;
+    if (family) base.family = family;
+    if (power) base.power = power;
+    if (supplier) base.supplier = supplier;
+    if (inStock) base.inStock = inStock;
+    // Override/remove
+    for (const [k, v] of Object.entries(params)) {
+      if (v === undefined) delete base[k];
+      else base[k] = v;
+    }
+    const qs = new URLSearchParams(base).toString();
+    return `/catalogue${qs ? `?${qs}` : ""}`;
+  };
+
   return (
     <div className="bg-surface min-h-screen">
       {/* ── Header catalogue ── */}
@@ -118,16 +166,26 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
 
       <div className="max-w-7xl mx-auto px-6 py-8 lg:flex gap-8">
         {/* ── Sidebar filtres ── */}
-        <aside className="lg:w-64 shrink-0 mb-8 lg:mb-0 space-y-6">
+        <aside className="lg:w-64 shrink-0 mb-8 lg:mb-0 space-y-3">
+          {/* Filtres actifs — bouton reset */}
+          {(category || brand || family || power || supplier || inStock || search) && (
+            <Link
+              href="/catalogue"
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 text-primary rounded-xl text-sm font-semibold hover:bg-primary/20 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Réinitialiser les filtres
+            </Link>
+          )}
+
           {/* Catégories */}
-          <div className="bg-white rounded-xl shadow-sm border border-border p-5">
-            <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4">
-              Catégories
-            </h3>
+          <FilterSection title="Catégories" defaultOpen={true} count={categories.length}>
             <ul className="space-y-1">
               <li>
                 <Link
-                  href="/catalogue"
+                  href={buildFilterUrl({ category: undefined })}
                   className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     !category && !brand
                       ? "bg-primary !text-white"
@@ -140,7 +198,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
               {categories.map((c) => (
                 <li key={c.id}>
                   <Link
-                    href={`/catalogue?category=${c.slug}`}
+                    href={buildFilterUrl({ category: c.slug, brand: undefined })}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       category === c.slug
                         ? "bg-primary !text-white"
@@ -157,18 +215,37 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
                 </li>
               ))}
             </ul>
-          </div>
+          </FilterSection>
+
+          {/* Familles */}
+          {families.length > 0 && (
+            <FilterSection title="Familles" count={families.length}>
+              <ul className="space-y-1 max-h-64 overflow-y-auto">
+                {families.map((f) => (
+                  <li key={f}>
+                    <Link
+                      href={buildFilterUrl({ family: family === f ? undefined : f })}
+                      className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        family === f
+                          ? "bg-primary !text-white"
+                          : "text-text-secondary hover:bg-surface"
+                      }`}
+                    >
+                      {f.replace(/\+/g, " ")}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </FilterSection>
+          )}
 
           {/* Marques */}
-          <div className="bg-white rounded-xl shadow-sm border border-border p-5">
-            <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4">
-              Marques
-            </h3>
+          <FilterSection title="Marques" count={brands.filter(b => b._count.products > 0).length}>
             <ul className="space-y-1 max-h-64 overflow-y-auto">
               {brands.filter(b => b._count.products > 0).map((b) => (
                 <li key={b.id}>
                   <Link
-                    href={`/catalogue?brand=${b.slug}`}
+                    href={buildFilterUrl({ brand: brand === b.slug ? undefined : b.slug, category: undefined })}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       brand === b.slug
                         ? "bg-primary !text-white"
@@ -181,19 +258,39 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
                 </li>
               ))}
             </ul>
-          </div>
+          </FilterSection>
+
+          {/* Fournisseurs */}
+          {suppliers.length > 0 && (
+            <FilterSection title="Fournisseurs" count={suppliers.filter(s => s._count.variants > 0).length}>
+              <ul className="space-y-1 max-h-48 overflow-y-auto">
+                {suppliers.filter(s => s._count.variants > 0).map((s) => (
+                  <li key={s.id}>
+                    <Link
+                      href={buildFilterUrl({ supplier: supplier === s.slug ? undefined : s.slug })}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        supplier === s.slug
+                          ? "bg-primary !text-white"
+                          : "text-text-secondary hover:bg-surface"
+                      }`}
+                    >
+                      <span className="truncate">{s.name}</span>
+                      <span className={`ml-auto text-xs ${supplier === s.slug ? "text-white/70" : "opacity-60"}`}>{s._count.variants}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </FilterSection>
+          )}
 
           {/* Puissances */}
           {powerValues.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm border border-border p-5">
-              <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4">
-                Puissance
-              </h3>
+            <FilterSection title="Puissance" count={powerValues.length}>
               <ul className="space-y-1 max-h-48 overflow-y-auto">
                 {powerValues.map((p) => (
                   <li key={p}>
                     <Link
-                      href={`/catalogue?power=${p}${category ? `&category=${category}` : ""}${brand ? `&brand=${brand}` : ""}`}
+                      href={buildFilterUrl({ power: power === String(p) ? undefined : String(p) })}
                       className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         power === String(p)
                           ? "bg-primary !text-white"
@@ -205,8 +302,23 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
                   </li>
                 ))}
               </ul>
-            </div>
+            </FilterSection>
           )}
+
+          {/* Stock disponible */}
+          <FilterSection title="Disponibilité" defaultOpen={true}>
+            <Link
+              href={buildFilterUrl({ inStock: inStock === "1" ? undefined : "1" })}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                inStock === "1"
+                  ? "bg-solar-green !text-white"
+                  : "text-text-secondary hover:bg-surface"
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full shrink-0 ${inStock === "1" ? "bg-white" : "bg-solar-green"}`} />
+              En stock uniquement
+            </Link>
+          </FilterSection>
         </aside>
 
         {/* ── Grille produits ── */}
