@@ -203,7 +203,8 @@ export default async function Home() {
             Nos marques partenaires
           </h2>
         </div>
-        <div className="relative">
+        <div className="relative space-y-8">
+          {/* Rangée 1 — défilement vers la gauche */}
           <div className="flex animate-scroll gap-12 items-center">
             {[
               { name: "Airwell", logo: "/brands/airwell.png" },
@@ -224,7 +225,39 @@ export default async function Home() {
               { name: "Domusa", logo: "/brands/domusa.png" },
               { name: "Eaton", logo: "/brands/eaton.png" },
             ].map((brand, i) => (
-              <div key={`${brand.name}-${i}`} className="shrink-0 px-4">
+              <div key={`row1-${brand.name}-${i}`} className="shrink-0 px-4">
+                <Image
+                  src={brand.logo}
+                  alt={brand.name}
+                  width={120}
+                  height={60}
+                  className="h-12 w-auto object-contain grayscale hover:grayscale-0 transition-all opacity-60 hover:opacity-100"
+                />
+              </div>
+            ))}
+          </div>
+          {/* Rangée 2 — défilement vers la droite */}
+          <div className="flex animate-scroll-reverse gap-12 items-center">
+            {[
+              { name: "Eaton", logo: "/brands/eaton.png" },
+              { name: "Domusa", logo: "/brands/domusa.png" },
+              { name: "Chaffoteaux", logo: "/brands/chaffoteaux.png" },
+              { name: "Axelair", logo: "/brands/axelair.png" },
+              { name: "Atlantic", logo: "/brands/atlantic.png" },
+              { name: "Ariston", logo: "/brands/ariston.png" },
+              { name: "AP Systems", logo: "/brands/apsystems.png" },
+              { name: "Airwell", logo: "/brands/airwell.png" },
+              // Doublé pour boucle infinie
+              { name: "Eaton", logo: "/brands/eaton.png" },
+              { name: "Domusa", logo: "/brands/domusa.png" },
+              { name: "Chaffoteaux", logo: "/brands/chaffoteaux.png" },
+              { name: "Axelair", logo: "/brands/axelair.png" },
+              { name: "Atlantic", logo: "/brands/atlantic.png" },
+              { name: "Ariston", logo: "/brands/ariston.png" },
+              { name: "AP Systems", logo: "/brands/apsystems.png" },
+              { name: "Airwell", logo: "/brands/airwell.png" },
+            ].map((brand, i) => (
+              <div key={`row2-${brand.name}-${i}`} className="shrink-0 px-4">
                 <Image
                   src={brand.logo}
                   alt={brand.name}

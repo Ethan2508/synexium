@@ -32,6 +32,7 @@ export async function GET(
         role: true,
         status: true,
         rejectedReason: true,
+        assignedAgency: true,
         cgvAcceptedAt: true,
         createdAt: true,
         updatedAt: true,

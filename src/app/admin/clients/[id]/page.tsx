@@ -19,6 +19,7 @@ type ClientDetail = {
   role: string;
   status: "PENDING" | "ACTIVE" | "REJECTED";
   rejectedReason: string | null;
+  assignedAgency: string | null;
   cgvAcceptedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -41,6 +42,7 @@ export default function AdminClientDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [agencyLoading, setAgencyLoading] = useState(false);
 
   useEffect(() => {
     fetch(`/api/admin/clients/${params.id}`)
@@ -69,6 +71,23 @@ export default function AdminClientDetailPage() {
     setClient(data.client);
     setActionLoading(false);
     setRejectMode(false);
+  };
+
+  const handleAgencyChange = async (agency: string) => {
+    setAgencyLoading(true);
+    await fetch("/api/admin/clients", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        clientId: client?.id,
+        action: "assign-agency",
+        agency: agency || null,
+      }),
+    });
+    const res = await fetch(`/api/admin/clients/${params.id}`);
+    const data = await res.json();
+    setClient(data.client);
+    setAgencyLoading(false);
   };
 
   const statusConfig: Record<string, { label: string; class: string }> = {
@@ -228,6 +247,46 @@ export default function AdminClientDetailPage() {
             <InfoRow label="Commandes passées" value={String(client._count.orders)} />
             <InfoRow label="Prix personnalisés" value={String(client._count.customerPrices)} />
           </Section>
+        </div>
+
+        {/* Agence de rattachement */}
+        <div className="bg-white rounded-xl border border-border shadow-sm p-6">
+          <h2 className="text-lg font-bold text-text-primary mb-4">Agence de rattachement</h2>
+          <p className="text-sm text-text-secondary mb-4">
+            Choisissez l'agence affichée dans « Votre contact chez nous » sur l'espace client.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { value: "SYNEXIUM_IDF", label: "Synexium — Île-de-France", detail: "6-8 Rue des Lilas, 93160 Noisy-le-Grand" },
+              { value: "FRANCILIENNE_LYON", label: "Francilienne Energy — Lyon", detail: "218 Av. Franklin Roosevelt, 69120 Vaulx-en-Velin" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleAgencyChange(opt.value)}
+                disabled={agencyLoading}
+                className={`flex-1 min-w-[200px] p-4 rounded-xl border-2 text-left transition ${
+                  client.assignedAgency === opt.value
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/40"
+                } disabled:opacity-50`}
+              >
+                <span className={`text-sm font-bold ${client.assignedAgency === opt.value ? "text-primary" : "text-text-primary"}`}>
+                  {opt.label}
+                </span>
+                <p className="text-xs text-text-secondary mt-1">{opt.detail}</p>
+                {client.assignedAgency === opt.value && (
+                  <span className="inline-block mt-2 text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                    ✓ Sélectionnée
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+          {!client.assignedAgency && (
+            <p className="text-xs text-solar-yellow mt-3 font-medium">
+              ⚠ Aucune agence assignée — le client ne voit pas de contact sur son espace.
+            </p>
+          )}
         </div>
 
         {/* Historique des commandes */}

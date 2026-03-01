@@ -45,6 +45,7 @@ model User {
   role                  String          @default("CLIENT")
   status                UserStatus      @default(PENDING)
   rejectedReason        String?
+  assignedAgency        String?         // "SYNEXIUM_IDF" | "FRANCILIENNE_LYON"
   cgvAcceptedAt         DateTime?
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @updatedAt

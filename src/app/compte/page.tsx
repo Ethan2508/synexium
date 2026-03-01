@@ -95,24 +95,28 @@ export default async function ComptePage() {
           </div>
         </div>
 
-        {/* Contact Synexium */}
-        <div className="bg-white rounded-xl shadow-sm border border-border p-6">
-          <h3 className="font-bold text-text-primary mb-4">Votre contact chez nous</h3>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold text-text-primary text-sm mb-2">Synexium — Île-de-France</h4>
-              <p className="text-sm text-text-secondary">📍 6-8 Rue des Lilas, 93160 Noisy-le-Grand</p>
-              <p className="text-sm text-text-secondary">📞 <a href="tel:+33148159200" className="text-primary hover:underline">01 48 15 92 00</a></p>
-              <p className="text-sm text-text-secondary">✉️ <a href="mailto:contact@synexium.fr" className="text-primary hover:underline">contact@synexium.fr</a></p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-text-primary text-sm mb-2">Francilienne Energy — Lyon</h4>
-              <p className="text-sm text-text-secondary">📍 218 Av. Franklin Roosevelt, 69120 Vaulx-en-Velin</p>
-              <p className="text-sm text-text-secondary">📞 <a href="tel:+33472687238" className="text-primary hover:underline">04 72 68 72 38</a></p>
-              <p className="text-sm text-text-secondary">✉️ <a href="mailto:contact@francilienne-energy.fr" className="text-primary hover:underline">contact@francilienne-energy.fr</a></p>
-            </div>
+        {/* Contact chez nous — seulement si une agence est assignée */}
+        {user.assignedAgency && (
+          <div className="bg-white rounded-xl shadow-sm border border-border p-6">
+            <h3 className="font-bold text-text-primary mb-4">Votre contact chez nous</h3>
+            {user.assignedAgency === "SYNEXIUM_IDF" && (
+              <div>
+                <h4 className="font-semibold text-text-primary text-sm mb-2">Synexium — Île-de-France</h4>
+                <p className="text-sm text-text-secondary">📍 6-8 Rue des Lilas, 93160 Noisy-le-Grand</p>
+                <p className="text-sm text-text-secondary">📞 <a href="tel:+33148159200" className="text-primary hover:underline">01 48 15 92 00</a></p>
+                <p className="text-sm text-text-secondary">✉️ <a href="mailto:contact@synexium.fr" className="text-primary hover:underline">contact@synexium.fr</a></p>
+              </div>
+            )}
+            {user.assignedAgency === "FRANCILIENNE_LYON" && (
+              <div>
+                <h4 className="font-semibold text-text-primary text-sm mb-2">Francilienne Energy — Lyon</h4>
+                <p className="text-sm text-text-secondary">📍 218 Av. Franklin Roosevelt, 69120 Vaulx-en-Velin</p>
+                <p className="text-sm text-text-secondary">📞 <a href="tel:+33472687238" className="text-primary hover:underline">04 72 68 72 38</a></p>
+                <p className="text-sm text-text-secondary">✉️ <a href="mailto:contact@francilienne-energy.fr" className="text-primary hover:underline">contact@francilienne-energy.fr</a></p>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Actions rapides */}
         {user.status === "ACTIVE" && (

@@ -68,10 +68,23 @@ export async function PATCH(request: NextRequest) {
   try {
     const admin = await requireAdmin();
 
-    const { clientId, action, reason } = await request.json();
+    const { clientId, action, reason, agency } = await request.json();
 
     if (!clientId || !action) {
       return NextResponse.json({ error: "clientId et action requis." }, { status: 400 });
+    }
+
+    // ── Assignation d'agence ──
+    if (action === "assign-agency") {
+      const validAgencies = ["SYNEXIUM_IDF", "FRANCILIENNE_LYON"];
+      if (agency && !validAgencies.includes(agency)) {
+        return NextResponse.json({ error: "Agence invalide." }, { status: 400 });
+      }
+      await prisma.user.update({
+        where: { id: clientId },
+        data: { assignedAgency: agency || null },
+      });
+      return NextResponse.json({ success: true });
     }
 
     if (action !== "approve" && action !== "reject") {
