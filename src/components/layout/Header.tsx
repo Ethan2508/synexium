@@ -7,38 +7,36 @@ import CartIcon from "@/components/CartIcon";
 import UserGreeting from "@/components/UserGreeting";
 
 /* ==========================================================================
-   PRODUCT TABS – Ligne 2 du header (style Voltaneo)
-   Chaque onglet a un label affiché et une liste de marques/liens
+   PRODUCT TABS – Basés sur les catégories réelles du CSV
    ========================================================================== */
 
 const PRODUCT_TABS = [
   {
-    label: "Panneaux",
-    href: "/catalogue?family=PANNEAUX+FRANCILIENNE",
+    label: "Photovoltaïque",
+    href: "/catalogue?category=photovoltaique",
+    color: "#7fb727",
     brands: [
-      { label: "Francilienne", href: "/catalogue?family=PANNEAUX+FRANCILIENNE" },
-    ],
-  },
-  {
-    label: "Onduleurs",
-    href: "/catalogue?search=onduleur",
-    brands: [
+      { label: "Panneaux Francilienne", href: "/catalogue?family=PANNEAUX+FRANCILIENNE" },
       { label: "Huawei", href: "/catalogue?family=ONDULEURS+HUAWEI" },
       { label: "Solplanet", href: "/catalogue?family=SOLPLANET" },
-    ],
-  },
-  {
-    label: "Micro-onduleurs",
-    href: "/catalogue?search=micro-onduleur",
-    brands: [
       { label: "Enphase", href: "/catalogue?family=ENPHASE" },
       { label: "Hoymiles", href: "/catalogue?family=HOYMILES" },
       { label: "AP Systems", href: "/catalogue?family=AP+SYSTEM" },
     ],
   },
   {
-    label: "Systèmes de fixation",
+    label: "Stockage",
+    href: "/catalogue?category=stockage",
+    color: "#eea400",
+    brands: [
+      { label: "Huawei", href: "/catalogue?family=STOCKAGE+HUAWEI" },
+      { label: "Hoymiles", href: "/catalogue?family=STOCKAGE+HOYMILES" },
+    ],
+  },
+  {
+    label: "Système de fixation",
     href: "/catalogue?category=systeme-de-fixation",
+    color: "#555555",
     brands: [
       { label: "K2 Systems", href: "/catalogue?family=K2+ET+ACIER" },
       { label: "GSE", href: "/catalogue?search=gse" },
@@ -47,42 +45,9 @@ const PRODUCT_TABS = [
     ],
   },
   {
-    label: "Coffrets",
-    href: "/catalogue?family=BOITIERS+AC+ET+DC",
-    brands: [
-      { label: "Boîtiers AC/DC", href: "/catalogue?family=BOITIERS+AC+ET+DC" },
-      { label: "Protections", href: "/catalogue?family=PROTECTIONS+ELEC" },
-    ],
-  },
-  {
-    label: "Câbles & accessoires",
-    href: "/catalogue?family=CABLES+ELECTRIQUES",
-    brands: [
-      { label: "Câbles solaires", href: "/catalogue?family=CABLES+ELECTRIQUES" },
-      { label: "Connectiques MC4", href: "/catalogue?search=mc4" },
-      { label: "Accessoires PAC", href: "/catalogue?family=PAC+ACCESSOIRES" },
-    ],
-  },
-  {
-    label: "Stockage",
-    href: "/catalogue?search=stockage",
-    brands: [
-      { label: "Huawei", href: "/catalogue?family=STOCKAGE+HUAWEI" },
-      { label: "Hoymiles", href: "/catalogue?family=STOCKAGE+HOYMILES" },
-      { label: "Solplanet", href: "/catalogue?search=stockage+solplanet" },
-    ],
-  },
-  {
-    label: "Pilotage",
-    href: "/catalogue?family=DOMOTIQUE",
-    brands: [
-      { label: "Domotique", href: "/catalogue?family=DOMOTIQUE" },
-      { label: "Bornes de recharge", href: "/catalogue?family=EV+CHARGER+KEBA" },
-    ],
-  },
-  {
-    label: "PAC & Chauffage",
-    href: "/catalogue?category=chauffage",
+    label: "Pompes à chaleur",
+    href: "/catalogue?category=pompes-a-chaleur",
+    color: "#e6332a",
     brands: [
       { label: "Airwell", href: "/catalogue?search=airwell" },
       { label: "Ariston", href: "/catalogue?search=ariston" },
@@ -91,31 +56,52 @@ const PRODUCT_TABS = [
     ],
   },
   {
+    label: "Chauffage",
+    href: "/catalogue?category=chauffage",
+    color: "#e6332a",
+    brands: [
+      { label: "Chaudière à granulé", href: "/catalogue?family=CHAUDIERE+A+GRANULE" },
+    ],
+  },
+  {
+    label: "Accessoires",
+    href: "/catalogue?category=accessoires",
+    color: "#009fe3",
+    brands: [
+      { label: "Boîtiers AC/DC", href: "/catalogue?family=BOITIERS+AC+ET+DC" },
+      { label: "Câbles", href: "/catalogue?family=CABLES+ELECTRIQUES" },
+      { label: "Protections", href: "/catalogue?family=PROTECTIONS+ELEC" },
+      { label: "Domotique", href: "/catalogue?family=DOMOTIQUE" },
+    ],
+  },
+  {
+    label: "Mobilité électrique",
+    href: "/catalogue?category=mobilite-electrique",
+    color: "#00a651",
+    brands: [
+      { label: "Keba", href: "/catalogue?family=EV+CHARGER+KEBA" },
+    ],
+  },
+  {
     label: "Déstockage",
     href: "/catalogue?search=destockage",
+    color: "#e6332a",
     brands: [],
   },
 ];
 
 /* ==========================================================================
-   MOBILE NAV DATA (simplified)
+   MOBILE NAV DATA
    ========================================================================== */
 
-const MOBILE_CATEGORIES = [
-  { title: "Panneaux", href: "/catalogue?family=PANNEAUX+FRANCILIENNE", color: "#7fb727" },
-  { title: "Onduleurs", href: "/catalogue?search=onduleur", color: "#7fb727" },
-  { title: "Micro-onduleurs", href: "/catalogue?search=micro-onduleur", color: "#7fb727" },
-  { title: "Systèmes de fixation", href: "/catalogue?category=systeme-de-fixation", color: "#555" },
-  { title: "Stockage", href: "/catalogue?search=stockage", color: "#eea400" },
-  { title: "PAC & Chauffage", href: "/catalogue?category=chauffage", color: "#e6332a" },
-  { title: "Câbles & Accessoires", href: "/catalogue?family=CABLES+ELECTRIQUES", color: "#009fe3" },
-  { title: "Déstockage", href: "/catalogue?search=destockage", color: "#e6332a" },
-];
+const MOBILE_CATEGORIES = PRODUCT_TABS.map((t) => ({
+  title: t.label,
+  href: t.href,
+  color: t.color,
+}));
 
 /* ==========================================================================
-   HEADER – 2 lignes desktop
-   Ligne 1 : Logo · Recherche · Contact · Blog · Compte/Bonjour
-   Ligne 2 : Onglets produits avec dropdown marques
+   HEADER – 2 lignes desktop, même fond partout
    ========================================================================== */
 
 export default function Header() {
@@ -125,7 +111,6 @@ export default function Header() {
   const navRef = useRef<HTMLDivElement>(null);
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
@@ -155,109 +140,101 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 shadow-lg">
+    <header className="sticky top-0 z-50 bg-primary text-white shadow-lg">
       {/* ── Ligne 1 : Logo · Search · Contact · Blog · Compte ── */}
-      <div className="bg-primary text-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center shrink-0">
-              <Image
-                src="/logo.png"
-                alt="Francilienne Energy"
-                width={180}
-                height={48}
-                style={{ width: "auto", height: "auto" }}
-                priority
-              />
-            </Link>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center shrink-0">
+            <Image
+              src="/logo.png"
+              alt="Francilienne Energy"
+              width={180}
+              height={48}
+              style={{ width: "auto", height: "auto" }}
+              priority
+            />
+          </Link>
 
-            {/* Search bar (desktop) */}
-            <form
-              action="/catalogue"
-              method="GET"
-              className="hidden lg:flex items-center bg-white/10 rounded-lg px-3 py-2 focus-within:bg-white/20 transition-colors flex-1 max-w-md mx-6"
+          {/* Search bar (desktop) */}
+          <form
+            action="/catalogue"
+            method="GET"
+            className="hidden lg:flex items-center bg-white/10 rounded-lg px-3 py-2 focus-within:bg-white/20 transition-colors flex-1 max-w-md mx-6"
+          >
+            <SearchIcon />
+            <input
+              type="text"
+              name="search"
+              placeholder="Rechercher un produit, une référence..."
+              className="bg-transparent border-none outline-none text-sm text-white placeholder-white/50 ml-2 w-full"
+            />
+          </form>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              aria-label="Rechercher"
             >
               <SearchIcon />
-              <input
-                type="text"
-                name="search"
-                placeholder="Rechercher un produit, une référence..."
-                className="bg-transparent border-none outline-none text-sm text-white placeholder-white/50 ml-2 w-full"
-              />
-            </form>
+            </button>
 
-            {/* Right actions */}
-            <div className="flex items-center gap-1">
-              {/* Mobile search toggle */}
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
-                aria-label="Rechercher"
-              >
-                <SearchIcon />
-              </button>
+            <Link
+              href="/contact"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 text-sm hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <PhoneIcon />
+              <span>Contact</span>
+            </Link>
 
-              <Link
-                href="/contact"
-                className="hidden md:flex items-center gap-1.5 px-3 py-2 text-sm hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <PhoneIcon />
-                <span>Contact</span>
-              </Link>
+            <Link
+              href="/blog"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 text-sm hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <BlogIcon />
+              <span>Blog</span>
+            </Link>
 
-              <Link
-                href="/blog"
-                className="hidden md:flex items-center gap-1.5 px-3 py-2 text-sm hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <BlogIcon />
-                <span>Blog</span>
-              </Link>
+            <UserGreeting />
+            <CartIcon />
 
-              {/* Greeting */}
-              <UserGreeting />
+            <Link
+              href="/compte"
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              aria-label="Mon compte"
+            >
+              <UserIcon />
+            </Link>
 
-              {/* Cart */}
-              <CartIcon />
-
-              {/* Account icon */}
-              <Link
-                href="/compte"
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-                aria-label="Mon compte"
-              >
-                <UserIcon />
-              </Link>
-
-              {/* Mobile burger */}
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
-                aria-label="Menu"
-              >
-                {menuOpen ? <CloseIcon /> : <MenuIcon />}
-              </button>
-            </div>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              aria-label="Menu"
+            >
+              {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* ── Ligne 2 : Onglets produits (desktop) ── */}
+      {/* ── Ligne 2 : Onglets catégories (desktop) — même fond primary ── */}
       <div
-        className="hidden lg:block bg-white border-b border-gray-200 relative"
+        className="hidden lg:block border-t border-white/15 relative"
         ref={navRef}
         onMouseLeave={handleNavLeave}
       >
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-0 overflow-x-auto">
+          <div className="flex items-center gap-0 overflow-x-auto scrollbar-none">
             {PRODUCT_TABS.map((tab, index) => (
               <div key={tab.label} className="relative">
                 <Link
                   href={tab.href}
-                  className={`block px-4 py-3 text-[13px] font-semibold uppercase tracking-wide whitespace-nowrap transition-colors border-b-2 ${
+                  className={`block px-3.5 py-2.5 text-[12px] font-semibold uppercase tracking-wide whitespace-nowrap transition-colors border-b-2 ${
                     activeTab === index
-                      ? "text-primary border-primary bg-primary/5"
-                      : "text-gray-700 border-transparent hover:text-primary hover:border-primary/40"
+                      ? "text-white border-solar-green bg-white/10"
+                      : "text-white/75 border-transparent hover:text-white hover:bg-white/5"
                   }`}
                   onMouseEnter={() => handleTabEnter(index)}
                   onClick={closeAll}
@@ -266,10 +243,9 @@ export default function Header() {
                 </Link>
               </div>
             ))}
-            {/* Tout le catalogue */}
             <Link
               href="/catalogue"
-              className="block px-4 py-3 text-[13px] font-semibold uppercase tracking-wide whitespace-nowrap text-primary border-b-2 border-transparent hover:border-primary/40 transition-colors ml-auto"
+              className="block px-3.5 py-2.5 text-[12px] font-semibold uppercase tracking-wide whitespace-nowrap text-solar-green border-b-2 border-transparent hover:border-solar-green/40 transition-colors ml-auto"
               onClick={closeAll}
             >
               Tout voir →
@@ -280,19 +256,16 @@ export default function Header() {
         {/* Dropdown marques */}
         {activeTab !== null && PRODUCT_TABS[activeTab].brands.length > 0 && (
           <div
-            className="absolute left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50"
+            className="absolute left-0 right-0 bg-primary border-t border-white/10 shadow-lg z-50"
             onMouseEnter={handleDropdownEnter}
           >
-            <div className="max-w-7xl mx-auto px-6 py-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">
-                  Marques :
-                </span>
+            <div className="max-w-7xl mx-auto px-6 py-3">
+              <div className="flex flex-wrap items-center gap-2">
                 {PRODUCT_TABS[activeTab].brands.map((brand) => (
                   <Link
                     key={brand.href}
                     href={brand.href}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-primary hover:text-white transition-colors border border-gray-200 hover:border-primary"
+                    className="px-4 py-1.5 text-sm font-medium text-white/80 bg-white/10 rounded-lg hover:bg-solar-green hover:text-white transition-colors border border-white/15 hover:border-solar-green"
                     onClick={closeAll}
                   >
                     {brand.label}
@@ -306,7 +279,7 @@ export default function Header() {
 
       {/* Mobile search bar */}
       {searchOpen && (
-        <div className="lg:hidden bg-primary px-6 py-3 border-t border-white/10">
+        <div className="lg:hidden px-6 py-3 border-t border-white/10">
           <form
             action="/catalogue"
             method="GET"
@@ -326,9 +299,8 @@ export default function Header() {
 
       {/* Mobile nav */}
       {menuOpen && (
-        <nav className="lg:hidden bg-primary border-t border-white/10 text-white">
+        <nav className="lg:hidden border-t border-white/10">
           <div className="max-w-7xl mx-auto px-6 py-4">
-            {/* Mobile categories */}
             <div className="mb-4">
               <p className="text-xs text-white/50 uppercase tracking-wider mb-2">Nos produits</p>
               {MOBILE_CATEGORIES.map((cat) => (
