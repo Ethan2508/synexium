@@ -26,13 +26,13 @@ const CATEGORY_MAP: Record<string, { name: string; color: string }> = {
   "STOCKAGE HUAWEI": { name: "Stockage", color: "#eea400" },
   "STOCKAGE HOYMILES": { name: "Stockage", color: "#eea400" },
   
-  // Intégration
-  "K2 ET ACIER": { name: "Intégration", color: "#555555" },
-  "COMPOSANTS GSE INROOF": { name: "Intégration", color: "#555555" },
-  "COMPOSANTS GSE GROUNDSYSTEM": { name: "Intégration", color: "#555555" },
-  "GSE GROUND SYSTEM EVOLUTION": { name: "Intégration", color: "#555555" },
-  "INTEGRATION FRANCILIENNE": { name: "Intégration", color: "#555555" },
-  "CARPORT": { name: "Intégration", color: "#555555" },
+  // Système de fixation
+  "K2 ET ACIER": { name: "Système de fixation", color: "#555555" },
+  "COMPOSANTS GSE INROOF": { name: "Système de fixation", color: "#555555" },
+  "COMPOSANTS GSE GROUNDSYSTEM": { name: "Système de fixation", color: "#555555" },
+  "GSE GROUND SYSTEM EVOLUTION": { name: "Système de fixation", color: "#555555" },
+  "INTEGRATION FRANCILIENNE": { name: "Système de fixation", color: "#555555" },
+  "CARPORT": { name: "Système de fixation", color: "#555555" },
   
   // Pompes à chaleur
   "PAC AIR EAU PANASONIC": { name: "Pompes à chaleur", color: "#e6332a" },

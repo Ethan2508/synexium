@@ -35,7 +35,7 @@ type ProductWithRelations = {
   category: { id: string; name: string; slug: string; color: string } | null;
   brand: { id: string; name: string; slug: string } | null;
   image: { url: string; alt: string } | null;
-  variants: Array<{ id: string; catalogPriceHT: number; powerKw: number | null }>;
+  variants: Array<{ id: string; catalogPriceHT: number; powerKw: number | null; supplierReference: string | null }>;
 };
 
 export default async function CataloguePage({ searchParams }: CataloguePageProps) {
@@ -112,7 +112,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
     include: {
       category: true,
       brand: true,
-      variants: { where: { active: true }, orderBy: { catalogPriceHT: "asc" }, take: 1, select: { id: true, catalogPriceHT: true, powerKw: true } },
+      variants: { where: { active: true }, orderBy: { catalogPriceHT: "asc" }, take: 1, select: { id: true, catalogPriceHT: true, powerKw: true, supplierReference: true } },
       image: true,
     },
     orderBy: { name: "asc" },
@@ -349,6 +349,7 @@ export default async function CataloguePage({ searchParams }: CataloguePageProps
 function ProductCard({ product }: { product: ProductWithRelations }) {
   const color = product.category?.color || "#283084";
   const mainPower = product.variants[0]?.powerKw;
+  const supplierRef = product.variants[0]?.supplierReference;
 
   return (
     <Link
@@ -387,9 +388,14 @@ function ProductCard({ product }: { product: ProductWithRelations }) {
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-2 mb-3 group-hover:text-primary transition-colors">
+        <h3 className="font-semibold text-text-primary text-sm leading-snug line-clamp-2 mb-2 group-hover:text-primary transition-colors">
           {product.name}
         </h3>
+        {supplierRef && (
+          <p className="text-[11px] text-text-secondary mb-2 font-mono truncate">
+            Réf. {supplierRef}
+          </p>
+        )}
 
         {mainPower && (
           <div className="mb-2">

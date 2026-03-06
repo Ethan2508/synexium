@@ -20,25 +20,7 @@ export default function ContactPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
-        {/* Horaires */}
-        <div className="bg-white rounded-xl shadow-sm border border-border p-6">
-          <h2 className="font-bold text-text-primary text-xl mb-4 flex items-center gap-2">
-            <ClockIcon />
-            Horaires d&apos;ouverture
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-text-primary mb-2">Jours ouvrés</h3>
-              <p className="text-text-secondary">Lundi – Vendredi : <span className="font-medium text-text-primary">8h30 – 18h00</span></p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-text-primary mb-2">Week-end & jours fériés</h3>
-              <p className="text-text-secondary">Samedi – Dimanche : <span className="font-medium text-heatpump-red">Fermé</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* 2 Sites */}
+        {/* 2 Sites avec horaires par site */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Site Paris / Île-de-France – Synexium */}
           <div className="bg-white rounded-xl shadow-sm border border-border p-6">
@@ -71,6 +53,18 @@ export default function ContactPage() {
                 <a href="mailto:contact@synexium.fr" className="text-primary font-medium hover:underline">
                   contact@synexium.fr
                 </a>
+              </div>
+              {/* Horaires */}
+              <div className="border-t border-border pt-3 mt-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <ClockIcon />
+                  <span className="font-semibold text-text-primary text-sm">Horaires</span>
+                </div>
+                <div className="text-text-secondary text-xs space-y-1 ml-7">
+                  <p>Lundi – Jeudi : <span className="font-medium text-text-primary">8h30 – 12h30 / 14h – 18h</span></p>
+                  <p>Vendredi : <span className="font-medium text-text-primary">8h30 – 13h / 14h – 17h</span></p>
+                  <p>Week-end : <span className="font-medium text-heatpump-red">Fermé</span></p>
+                </div>
               </div>
             </div>
           </div>
@@ -107,30 +101,20 @@ export default function ContactPage() {
                   contact@francilienne-energy.fr
                 </a>
               </div>
+              {/* Horaires */}
+              <div className="border-t border-border pt-3 mt-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <ClockIcon />
+                  <span className="font-semibold text-text-primary text-sm">Horaires</span>
+                </div>
+                <div className="text-text-secondary text-xs space-y-1 ml-7">
+                  <p>Lundi – Jeudi : <span className="font-medium text-text-primary">8h30 – 12h30 / 14h – 18h</span></p>
+                  <p>Vendredi : <span className="font-medium text-text-primary">8h30 – 13h / 14h – 17h</span></p>
+                  <p>Week-end : <span className="font-medium text-heatpump-red">Fermé</span></p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Contact rapide */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <QuickContact
-            icon={<PhoneIcon />}
-            title="Commercial"
-            description="Questions produits, devis, tarifs"
-            action={{ label: "04 72 68 72 38", href: "tel:+33472687238" }}
-          />
-          <QuickContact
-            icon={<ToolIcon />}
-            title="Support technique"
-            description="Accompagnement projets, SAV"
-            action={{ label: "contact@francilienne-energy.fr", href: "mailto:contact@francilienne-energy.fr" }}
-          />
-          <QuickContact
-            icon={<TruckIcon />}
-            title="Logistique"
-            description="Suivi livraison, retrait sur site"
-            action={{ label: "04 72 68 72 38", href: "tel:+33472687238" }}
-          />
         </div>
 
         {/* Formulaire contact */}
@@ -207,36 +191,6 @@ export default function ContactPage() {
           </form>
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ===== Sub-components ===== */
-
-function QuickContact({
-  icon,
-  title,
-  description,
-  action,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  action: { label: string; href: string };
-}) {
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-border p-6 text-center">
-      <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-        {icon}
-      </div>
-      <h3 className="font-bold text-text-primary mb-1">{title}</h3>
-      <p className="text-sm text-text-secondary mb-4">{description}</p>
-      <a
-        href={action.href}
-        className="text-primary font-medium hover:underline text-sm"
-      >
-        {action.label}
-      </a>
     </div>
   );
 }
