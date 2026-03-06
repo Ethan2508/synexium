@@ -87,7 +87,7 @@ export default function AccountDropdown() {
                   <span className="w-2 h-2 bg-green-500 rounded-full" />
                   <span className="text-xs font-semibold text-green-600 uppercase tracking-wide">Connecté</span>
                 </div>
-                <p className="font-semibold text-sm truncate">Bonjour {user.firstName}</p>
+                <p className="font-semibold text-sm truncate">Bonjour {user.firstName.toUpperCase()}</p>
                 {user.email && (
                   <p className="text-xs text-text-secondary truncate">{user.email}</p>
                 )}
