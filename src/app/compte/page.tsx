@@ -102,7 +102,7 @@ export default async function ComptePage() {
             {user.assignedAgency === "SYNEXIUM_IDF" && (
               <div>
                 <h4 className="font-semibold text-text-primary text-sm mb-2">Synexium — Île-de-France</h4>
-                <p className="text-sm text-text-secondary">📍 6-8 Rue des Lilas, 93160 Noisy-le-Grand</p>
+                <p className="text-sm text-text-secondary">📍 16 Av. du Valquiou, Bât. C, 93290 Tremblay-en-France</p>
                 <p className="text-sm text-text-secondary">📞 <a href="tel:+33148159200" className="text-primary hover:underline">01 48 15 92 00</a></p>
                 <p className="text-sm text-text-secondary">✉️ <a href="mailto:contact@synexium.fr" className="text-primary hover:underline">contact@synexium.fr</a></p>
               </div>

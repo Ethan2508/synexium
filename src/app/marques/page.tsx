@@ -6,7 +6,7 @@ export const revalidate = 120; // ISR: revalider toutes les 2 min
 
 export const metadata = {
   title: "Nos marques | Francilienne Energy",
-  description: "Découvrez les marques de référence en photovoltaïque, pompes à chaleur et solutions énergétiques.",
+  description: "Découvrez les marques de référence en solaire, pompes à chaleur et solutions énergétiques.",
 };
 
 // Descriptions des marques
@@ -15,14 +15,14 @@ const BRAND_DESC: Record<string, string> = {
   "Hoymiles": "Micro-onduleurs et solutions de stockage innovantes.",
   "Huawei": "Onduleurs intelligents et systèmes de stockage haute performance.",
   "K2 Systems": "Systèmes de montage et structures pour panneaux solaires.",
-  "GSE": "Solutions d'intégration toiture et fixation photovoltaïque.",
+  "GSE": "Solutions d'intégration toiture et fixation solaire.",
   "Panasonic": "Pompes à chaleur haute efficacité et climatisation.",
   "Airwell": "PAC air-air et air-eau pour chauffage et climatisation.",
   "Ariston": "Systèmes de chauffage et production d'eau chaude sanitaire.",
   "Atlantic": "Solutions de chauffage et eau chaude sanitaire.",
-  "Solplanet": "Onduleurs photovoltaïques fiables et performants.",
+  "Solplanet": "Onduleurs solaires fiables et performants.",
   "Keba": "Bornes de recharge pour véhicules électriques.",
-  "AP Systems": "Micro-onduleurs intelligents pour le photovoltaïque.",
+  "AP Systems": "Micro-onduleurs intelligents pour le solaire.",
   "Domusa": "Chaudières à granulés et solutions de chauffage biomasse.",
   "Eaton": "Protection électrique et gestion de l'énergie.",
   "Chaffoteaux": "Solutions de chauffage et eau chaude sanitaire.",

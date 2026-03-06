@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "Distributeur professionnel de panneaux solaires, onduleurs, pompes à chaleur et solutions de stockage pour installateurs et bureaux d'études. Enphase, Hoymiles, Huawei, Panasonic.",
   keywords: [
     "panneaux solaires",
-    "photovoltaïque",
+    "solaire",
     "onduleur",
     "micro-onduleur",
     "pompe à chaleur",

@@ -18,7 +18,7 @@ export default function Footer() {
             />
           </div>
           <p className="text-white/60 text-sm leading-relaxed">
-            Distributeur B2B de solutions énergétiques&nbsp;: photovoltaïque, pompes à
+            Distributeur B2B de solutions énergétiques&nbsp;: solaire, pompes à
             chaleur et climatisation pour installateurs et bureaux d'études.
           </p>
         </div>
@@ -35,9 +35,9 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/catalogue?category=photovoltaique" className="text-white/60 hover:text-white transition-colors">
+              <Link href="/catalogue?category=solaire" className="text-white/60 hover:text-white transition-colors">
                 <span className="inline-block w-2 h-2 rounded-full bg-solar-green mr-2" />
-                Photovoltaïque
+                Solaire
               </Link>
             </li>
             <li>

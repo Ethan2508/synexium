@@ -115,7 +115,7 @@ export default async function Home() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
             <CategoryCard
               title="Panneaux"
-              description="Panneaux photovoltaïques Francilienne et partenaires"
+              description="Panneaux solaires Francilienne et partenaires"
               color="#7fb727"
               href="/catalogue?family=PANNEAUX+FRANCILIENNE"
               icon={<SolarIcon />}
@@ -207,14 +207,16 @@ export default async function Home() {
               { name: "Domusa", logo: "/brands/domusa.png" },
               { name: "Eaton", logo: "/brands/eaton.png" },
             ].map((brand, i) => (
-              <div key={`row1-${brand.name}-${i}`} className="shrink-0 px-4">
-                <Image
-                  src={brand.logo}
-                  alt={brand.name}
-                  width={120}
-                  height={60}
-                  className="h-12 w-auto object-contain"
-                />
+              <div key={`row1-${brand.name}-${i}`} className="shrink-0">
+                <div className="bg-white rounded-xl border border-border shadow-sm px-6 py-4 flex items-center justify-center h-20 w-36">
+                  <Image
+                    src={brand.logo}
+                    alt={brand.name}
+                    width={120}
+                    height={60}
+                    className="h-10 w-auto object-contain"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -237,14 +239,16 @@ export default async function Home() {
               { name: "AP Systems", logo: "/brands/apsystems.png" },
               { name: "Airwell", logo: "/brands/airwell.png" },
             ].map((brand, i) => (
-              <div key={`row2-${brand.name}-${i}`} className="shrink-0 px-4">
-                <Image
-                  src={brand.logo}
-                  alt={brand.name}
-                  width={120}
-                  height={60}
-                  className="h-12 w-auto object-contain"
-                />
+              <div key={`row2-${brand.name}-${i}`} className="shrink-0">
+                <div className="bg-white rounded-xl border border-border shadow-sm px-6 py-4 flex items-center justify-center h-20 w-36">
+                  <Image
+                    src={brand.logo}
+                    alt={brand.name}
+                    width={120}
+                    height={60}
+                    className="h-10 w-auto object-contain"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -265,7 +269,7 @@ export default async function Home() {
             <div>
               <span className="text-xs font-bold text-primary uppercase tracking-widest mb-3 block">Nos solutions</span>
               <p className="text-text-secondary text-lg leading-relaxed">
-                Francilienne Energy offre des solutions solaires sur mesure, combinant panneaux photovoltaïques
+                Francilienne Energy offre des solutions solaires sur mesure, combinant panneaux solaires
                 performants et structures de montage, pour une énergie verte et efficace.
               </p>
             </div>
@@ -278,7 +282,7 @@ export default async function Home() {
               </div>
               <p className="text-text-secondary leading-relaxed">
                 Francilienne Energy a pour objectif de s&apos;adapter en permanence aux évolutions technologiques
-                des cellules photovoltaïques, ce qui nous permet de vous proposer les solutions les plus performantes.
+                des cellules solaires, ce qui nous permet de vous proposer les solutions les plus performantes.
                 Près d&apos;un million de panneaux déjà distribués sur le marché français et plus encore sur l&apos;Europe.
               </p>
             </div>
@@ -291,7 +295,7 @@ export default async function Home() {
               <p className="text-4xl font-extrabold text-primary mb-3">+10 MW</p>
               <p className="text-text-secondary leading-relaxed">
                 Francilienne Energy dispose de plus de 10 Méga Watt en stock permanent de panneaux
-                photovoltaïques (tous produits confondus) et structures de montage à travers nos
+                solaires (tous produits confondus) et structures de montage à travers nos
                 différentes plateformes logistiques.
               </p>
             </div>

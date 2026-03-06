@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SLIDES = [
-  { image: "/hero/hero-panneaux.jpg", alt: "Panneaux photovoltaïques Francilienne Energy" },
+  { image: "/hero/hero-panneaux.jpg", alt: "Panneaux solaires Francilienne Energy" },
   { image: "/hero/hero-install.jpg", alt: "Installation solaire professionnelle" },
   { image: "/hero/hero-pac.jpg", alt: "Pompes à chaleur et climatisation" },
 ];
@@ -39,7 +39,7 @@ export default function HeroCarousel() {
               <span className="text-green-300">solutions énergétiques</span>
             </h1>
             <p className="text-white/70 text-lg max-w-md mb-8">
-              Plus de 650 références en photovoltaïque, pompes à chaleur et climatisation.
+              Plus de 650 références en solaire, pompes à chaleur et climatisation.
               Stock réel, prix négociés, livraison rapide.
             </p>
 

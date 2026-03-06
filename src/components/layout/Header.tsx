@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import CartIcon from "@/components/CartIcon";
-import UserGreeting from "@/components/UserGreeting";
+import AccountDropdown from "@/components/AccountDropdown";
 
 /* ==========================================================================
    PRODUCT TABS – Basés sur les catégories réelles du CSV
@@ -12,8 +12,8 @@ import UserGreeting from "@/components/UserGreeting";
 
 const PRODUCT_TABS = [
   {
-    label: "Photovoltaïque",
-    href: "/catalogue?category=photovoltaique",
+    label: "Solaire",
+    href: "/catalogue?category=solaire",
     color: "#7fb727",
     brands: [
       { label: "Panneaux Francilienne", href: "/catalogue?family=PANNEAUX+FRANCILIENNE" },
@@ -197,12 +197,13 @@ export default function Header() {
               <span>Blog</span>
             </Link>
 
-            <UserGreeting />
+            <AccountDropdown />
             <CartIcon />
 
+            {/* Mobile-only account icon */}
             <Link
               href="/compte"
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
               aria-label="Mon compte"
             >
               <UserIcon />

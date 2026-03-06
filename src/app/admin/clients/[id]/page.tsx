@@ -257,7 +257,7 @@ export default function AdminClientDetailPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             {[
-              { value: "SYNEXIUM_IDF", label: "Synexium — Île-de-France", detail: "6-8 Rue des Lilas, 93160 Noisy-le-Grand" },
+              { value: "SYNEXIUM_IDF", label: "Synexium — Île-de-France", detail: "16 Av. du Valquiou, Bât. C, 93290 Tremblay-en-France" },
               { value: "FRANCILIENNE_LYON", label: "Francilienne Energy — Lyon", detail: "218 Av. Franklin Roosevelt, 69120 Vaulx-en-Velin" },
             ].map((opt) => (
               <button

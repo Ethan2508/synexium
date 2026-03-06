@@ -37,9 +37,9 @@ export default function ContactPage() {
               <div className="flex items-start gap-2">
                 <MapPinIcon />
                 <p className="text-text-secondary">
-                  6-8 Rue des Lilas<br />
-                  93160 Noisy-le-Grand<br />
-                  France
+                  16 Avenue du Valquiou<br />
+                  Bâtiment C<br />
+                  93290 Tremblay-en-France
                 </p>
               </div>
               <div className="flex items-center gap-2">
