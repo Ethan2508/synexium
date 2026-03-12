@@ -222,7 +222,7 @@ export default function Header() {
 
       {/* ── Ligne 2 : Onglets catégories (desktop) — même fond primary ── */}
       <div
-        className="hidden lg:block border-t border-white/15 relative"
+        className="hidden lg:block relative"
         ref={navRef}
         onMouseLeave={handleNavLeave}
       >
