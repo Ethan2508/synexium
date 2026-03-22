@@ -255,8 +255,49 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ── Blog / Actualités ── */}
+      <section className="bg-white py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+              Actualités & conseils
+            </h2>
+            <p className="text-text-secondary max-w-xl mx-auto">
+              Restez informé des dernières tendances du marché de l&apos;énergie renouvelable
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <BlogCard
+              title="Autoconsommation solaire : les clés pour vos clients en 2026"
+              excerpt="Le marché de l'autoconsommation explose. Découvrez les configurations les plus demandées et comment dimensionner vos projets résidentiels et tertiaires."
+              category="Solaire"
+              color="#7fb727"
+              date="18 mars 2026"
+              readTime="5 min"
+            />
+            <BlogCard
+              title="Pompes à chaleur R290 : la transition propane s'accélère"
+              excerpt="Avec l'interdiction progressive des fluides à fort GWP, les PAC au R290 deviennent incontournables. Point sur les gammes disponibles et les aides en vigueur."
+              category="Chauffage"
+              color="#e6332a"
+              date="12 mars 2026"
+              readTime="4 min"
+            />
+            <BlogCard
+              title="Stockage résidentiel : quelle solution recommander ?"
+              excerpt="Batteries haute tension vs basse tension, hybride ou AC-coupled : guide comparatif pour aider vos clients à choisir la solution adaptée à leur installation."
+              category="Stockage"
+              color="#eea400"
+              date="5 mars 2026"
+              readTime="6 min"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* ── Pourquoi Francilienne Energy ── */}
-      <section className="bg-white py-16 lg:py-24">
+      <section className="bg-surface py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
@@ -348,6 +389,60 @@ export default async function Home() {
 /* ===================================================================
    SUB-COMPONENTS
    =================================================================== */
+
+function BlogCard({
+  title,
+  excerpt,
+  category,
+  color,
+  date,
+  readTime,
+}: {
+  title: string;
+  excerpt: string;
+  category: string;
+  color: string;
+  date: string;
+  readTime: string;
+}) {
+  return (
+    <article className="group bg-surface rounded-2xl border border-border hover:shadow-lg hover:-translate-y-1 transition-all overflow-hidden">
+      <div className="h-48 relative" style={{ backgroundColor: `${color}10` }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center"
+            style={{ backgroundColor: `${color}20` }}
+          >
+            <svg className="w-8 h-8" style={{ color }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25H5.625a2.25 2.25 0 01-2.25-2.25V8.625c0-.621.504-1.125 1.125-1.125H7.5" />
+            </svg>
+          </div>
+        </div>
+        <div className="absolute top-4 left-4">
+          <span
+            className="text-xs font-bold px-3 py-1 rounded-full text-white"
+            style={{ backgroundColor: color }}
+          >
+            {category}
+          </span>
+        </div>
+      </div>
+      <div className="p-6">
+        <div className="flex items-center gap-3 text-xs text-text-secondary mb-3">
+          <span>{date}</span>
+          <span className="w-1 h-1 rounded-full bg-text-secondary/40" />
+          <span>{readTime} de lecture</span>
+        </div>
+        <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-primary transition-colors line-clamp-2">
+          {title}
+        </h3>
+        <p className="text-sm text-text-secondary leading-relaxed line-clamp-3">
+          {excerpt}
+        </p>
+      </div>
+    </article>
+  );
+}
 
 function CategoryCard({
   title,
