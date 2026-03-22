@@ -18,8 +18,8 @@
   --color-text-secondary: #6b7194;
 
   /* ===== Fonts ===== */
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: var(--font-exo2), system-ui, -apple-system, sans-serif;
+  --font-mono: monospace;
 }
 
 /* ===== Base reset ===== */

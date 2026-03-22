@@ -31,8 +31,8 @@ const config: Config = {
         black: "#000000",
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "monospace"],
+        sans: ["var(--font-exo2)", "system-ui", "sans-serif"],
+        mono: ["monospace"],
       },
       animation: {
         scroll: "scroll 30s linear infinite",
