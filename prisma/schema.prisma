@@ -361,6 +361,9 @@ enum AdminActionType {
   PRICE_DELETED
   ORDER_STATUS_CHANGED
   IMPORT_CSV
+  BLOG_CREATED
+  BLOG_UPDATED
+  BLOG_DELETED
 }
 
 model AdminLog {
@@ -374,5 +377,27 @@ model AdminLog {
 
   @@index([adminId])
   @@index([action])
+  @@index([createdAt])
+}
+
+// ─── Blog ───
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  coverUrl    String?
+  category    String
+  categoryColor String @default("#283084")
+  published   Boolean  @default(false)
+  authorId    String
+  readTime    String   @default("5 min")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([published])
   @@index([createdAt])
 }
