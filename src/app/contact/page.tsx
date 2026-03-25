@@ -1,6 +1,8 @@
+import Image from "next/image";
+
 export const metadata = {
-  title: "Contact | Francilienne Energy",
-  description: "Contactez Synexium - Francilienne Energy. Nos équipes à Paris et Lyon sont à votre disposition.",
+  title: "Contact | Synexium",
+  description: "Contactez Synexium. Nos équipes à Tremblay-en-France et Vaulx-en-Velin (siège social) sont à votre disposition.",
 };
 
 /* =========================================================================
@@ -22,99 +24,128 @@ export default function ContactPage() {
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         {/* 2 Sites avec horaires par site */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Site Paris / Île-de-France – Synexium */}
-          <div className="bg-white rounded-xl shadow-sm border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <LocationIcon />
-              </div>
-              <div>
-                <h3 className="font-bold text-text-primary">Synexium</h3>
-                <p className="text-xs text-text-secondary">Île-de-France</p>
-              </div>
+          {/* Site Tremblay-en-France – Synexium */}
+          <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+            <div className="relative w-full h-48">
+              <Image
+                src="/tremblay-enseigne.png"
+                alt="Synexium – Tremblay-en-France"
+                fill
+                className="object-cover"
+              />
             </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-2">
-                <MapPinIcon />
-                <p className="text-text-secondary">
-                  16 Avenue du Valquiou<br />
-                  Bâtiment C<br />
-                  93290 Tremblay-en-France
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <PhoneIcon />
-                <a href="tel:+33148159200" className="text-primary font-medium hover:underline">
-                  01 48 15 92 00
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <EmailIcon />
-                <a href="mailto:contact@synexium.fr" className="text-primary font-medium hover:underline">
-                  contact@synexium.fr
-                </a>
-              </div>
-              {/* Horaires */}
-              <div className="border-t border-border pt-3 mt-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <ClockIcon />
-                  <span className="font-semibold text-text-primary text-sm">Horaires</span>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <LocationIcon />
                 </div>
-                <div className="text-text-secondary text-xs space-y-1 ml-7">
-                  <p>Lundi – Jeudi : <span className="font-medium text-text-primary">8h30 – 12h30 / 14h – 18h</span></p>
-                  <p>Vendredi : <span className="font-medium text-text-primary">8h30 – 13h / 14h – 17h</span></p>
-                  <p>Week-end : <span className="font-medium text-heatpump-red">Fermé</span></p>
+                <div>
+                  <h3 className="font-bold text-text-primary">Synexium</h3>
+                  <p className="text-xs text-text-secondary">Île-de-France</p>
+                </div>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start gap-2">
+                  <MapPinIcon />
+                  <p className="text-text-secondary">
+                    16 Avenue du Valquiou<br />
+                    Bâtiment C<br />
+                    93290 Tremblay-en-France
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <PhoneIcon />
+                  <a href="tel:+33472687238" className="text-primary font-medium hover:underline">
+                    04 72 68 72 38
+                  </a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <EmailIcon />
+                  <a href="mailto:contact@synexium.fr" className="text-primary font-medium hover:underline">
+                    contact@synexium.fr
+                  </a>
+                </div>
+                {/* Horaires */}
+                <div className="border-t border-border pt-3 mt-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ClockIcon />
+                    <span className="font-semibold text-text-primary text-sm">Horaires</span>
+                  </div>
+                  <div className="text-text-secondary text-xs space-y-1 ml-7">
+                    <p>Lundi – Jeudi : <span className="font-medium text-text-primary">8h30 – 12h30 / 14h – 18h</span></p>
+                    <p>Vendredi : <span className="font-medium text-text-primary">8h30 – 13h / 14h – 17h</span></p>
+                    <p>Week-end : <span className="font-medium text-heatpump-red">Fermé</span></p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Site Lyon – Francilienne Energy */}
-          <div className="bg-white rounded-xl shadow-sm border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <LocationIcon />
-              </div>
-              <div>
-                <h3 className="font-bold text-text-primary">Francilienne Energy</h3>
-                <p className="text-xs text-text-secondary">Rhône-Alpes</p>
-              </div>
+          {/* Site Vaulx-en-Velin – Synexium (Siège social) */}
+          <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+            <div className="relative w-full h-48">
+              <Image
+                src="/vev-enseigne.jpg"
+                alt="Synexium – Siège social, Vaulx-en-Velin"
+                fill
+                className="object-cover"
+              />
             </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-2">
-                <MapPinIcon />
-                <p className="text-text-secondary">
-                  218 Av. Franklin Roosevelt<br />
-                  69120 Vaulx-en-Velin<br />
-                  France
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <PhoneIcon />
-                <a href="tel:+33472687238" className="text-primary font-medium hover:underline">
-                  04 72 68 72 38
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <EmailIcon />
-                <a href="mailto:contact@francilienne-energy.fr" className="text-primary font-medium hover:underline">
-                  contact@francilienne-energy.fr
-                </a>
-              </div>
-              {/* Horaires */}
-              <div className="border-t border-border pt-3 mt-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <ClockIcon />
-                  <span className="font-semibold text-text-primary text-sm">Horaires</span>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <LocationIcon />
                 </div>
-                <div className="text-text-secondary text-xs space-y-1 ml-7">
-                  <p>Lundi – Jeudi : <span className="font-medium text-text-primary">8h30 – 12h30 / 14h – 18h</span></p>
-                  <p>Vendredi : <span className="font-medium text-text-primary">8h30 – 13h / 14h – 17h</span></p>
-                  <p>Week-end : <span className="font-medium text-heatpump-red">Fermé</span></p>
+                <div>
+                  <h3 className="font-bold text-text-primary">Synexium <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full ml-1">Siège social</span></h3>
+                  <p className="text-xs text-text-secondary">Rhône-Alpes</p>
+                </div>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start gap-2">
+                  <MapPinIcon />
+                  <p className="text-text-secondary">
+                    218 Av. Franklin Roosevelt<br />
+                    69120 Vaulx-en-Velin
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <PhoneIcon />
+                  <a href="tel:+33472687238" className="text-primary font-medium hover:underline">
+                    04 72 68 72 38
+                  </a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <EmailIcon />
+                  <a href="mailto:contact@synexium.fr" className="text-primary font-medium hover:underline">
+                    contact@synexium.fr
+                  </a>
+                </div>
+                {/* Horaires */}
+                <div className="border-t border-border pt-3 mt-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ClockIcon />
+                    <span className="font-semibold text-text-primary text-sm">Horaires</span>
+                  </div>
+                  <div className="text-text-secondary text-xs space-y-1 ml-7">
+                    <p>Lundi – Jeudi : <span className="font-medium text-text-primary">8h30 – 12h30 / 14h – 18h</span></p>
+                    <p>Vendredi : <span className="font-medium text-text-primary">8h30 – 13h / 14h – 17h</span></p>
+                    <p>Week-end : <span className="font-medium text-heatpump-red">Fermé</span></p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Photo panoramique du siège */}
+        <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden shadow-sm border border-border">
+          <Image
+            src="/vev-enseignes.jpg"
+            alt="Synexium – Siège social, Vaulx-en-Velin"
+            fill
+            className="object-cover"
+          />
         </div>
 
         {/* Formulaire contact */}
