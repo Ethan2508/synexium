@@ -30,13 +30,9 @@ export default function HeroCarousel() {
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* ── Partie gauche : Titre ── */}
           <div>
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Espace professionnel B2B
-            </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-5">
-              Votre distributeur<br />
-              <span className="text-green-300">solutions énergétiques</span>
+              Distributeur expert en<br />
+              <span className="text-green-300">rénovation énergétique</span>
             </h1>
             <p className="text-white/70 text-lg max-w-md mb-8">
               Plus de 650 références en solaire, pompes à chaleur et climatisation.
