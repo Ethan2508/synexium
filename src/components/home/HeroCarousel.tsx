@@ -5,9 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SLIDES = [
-  { image: "/hero/hero-panneaux.jpg", alt: "Panneaux solaires Francilienne Energy" },
-  { image: "/hero/hero-install.jpg", alt: "Installation solaire professionnelle" },
-  { image: "/hero/hero-pac.jpg", alt: "Pompes à chaleur et climatisation" },
+  { image: "/hero/hero-panneaux.png", alt: "Installation panneaux solaires surimposition" },
+  { image: "/hero/hero-carport.png", alt: "Carport solaire avec véhicule électrique" },
+  { image: "/hero/hero-install.png", alt: "Maison équipée panneaux solaires" },
 ];
 
 export default function HeroCarousel() {

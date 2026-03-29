@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import HeroCarousel from "@/components/home/HeroCarousel";
+import PromoBanners from "@/components/home/PromoBanners";
 
 export const revalidate = 60;
 
@@ -37,6 +38,9 @@ export default async function Home() {
     <>
       {/* ── Hero Carrousel ── */}
       <HeroCarousel />
+
+      {/* ── Bannières promo ── */}
+      <PromoBanners />
 
       {/* ── Produits du moment ── */}
       <section className="bg-white py-16 lg:py-20">
@@ -124,42 +128,42 @@ export default async function Home() {
               description="Panneaux solaires Francilienne et partenaires"
               color="#7fb727"
               href="/catalogue?family=PANNEAUX+FRANCILIENNE"
-              icon={<SolarIcon />}
+              iconSrc="/icons/panneaux.svg"
             />
             <CategoryCard
               title="Onduleurs"
               description="Huawei, Solplanet et solutions string"
               color="#7fb727"
               href="/catalogue?family=ONDULEURS+HUAWEI"
-              icon={<InverterIcon />}
+              iconSrc="/icons/onduleur.svg"
             />
             <CategoryCard
               title="Micro-onduleurs"
               description="Enphase, Hoymiles, AP Systems"
               color="#7fb727"
               href="/catalogue?search=micro-onduleur"
-              icon={<MicroInverterIcon />}
+              iconSrc="/icons/micro-onduleur.svg"
             />
             <CategoryCard
               title="Systèmes de fixation"
               description="K2 Systems, GSE, intégration toiture et sol"
               color="#555"
               href="/catalogue?category=systeme-de-fixation"
-              icon={<StructureIcon />}
+              iconSrc="/icons/solutions.svg"
             />
             <CategoryCard
               title="Stockage"
               description="Batteries Huawei, Hoymiles, Solplanet"
               color="#eea400"
               href="/catalogue?category=stockage"
-              icon={<BatteryIcon />}
+              iconSrc="/icons/stockage.svg"
             />
             <CategoryCard
               title="Pompes à chaleur"
               description="PAC air-eau, air-air, ballons"
               color="#e6332a"
               href="/catalogue?category=chauffage"
-              icon={<HeatIcon />}
+              iconSrc="/icons/pompe-a-chaleur.svg"
             />
           </div>
         </div>
@@ -351,8 +355,8 @@ export default async function Home() {
             </div>
             <div className="bg-solar-green/5 rounded-2xl p-8 border border-solar-green/20">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-14 h-14 rounded-xl bg-solar-green/10 flex items-center justify-center">
-                  <SolarIcon />
+                <div className="w-14 h-14 rounded-xl bg-solar-green flex items-center justify-center">
+                  <Image src="/icons/depuis-2009.svg" alt="" width={28} height={28} />
                 </div>
                 <span className="text-2xl font-extrabold text-solar-green">Depuis 2009</span>
               </div>
@@ -367,7 +371,12 @@ export default async function Home() {
           {/* NOS DISPONIBILITÉS + NOS ENGAGEMENTS */}
           <div className="grid sm:grid-cols-2 gap-8">
             <div className="bg-primary/5 rounded-2xl p-8 border border-primary/10">
-              <span className="text-xs font-bold text-primary uppercase tracking-widest mb-3 block">Nos disponibilités</span>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
+                  <Image src="/icons/disponibilites.svg" alt="" width={24} height={24} />
+                </div>
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">Nos disponibilités</span>
+              </div>
               <p className="text-4xl font-extrabold text-primary mb-3">+10 MW</p>
               <p className="text-text-secondary leading-relaxed">
                 Francilienne Energy dispose de plus de 10 Méga Watt en stock permanent de panneaux
@@ -376,14 +385,18 @@ export default async function Home() {
               </p>
             </div>
             <div className="bg-surface rounded-2xl p-8 border border-border">
-              <span className="text-xs font-bold text-primary uppercase tracking-widest mb-3 block">Nos engagements</span>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
+                  <Image src="/icons/engagements.svg" alt="" width={24} height={24} />
+                </div>
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">Nos engagements</span>
+              </div>
               <p className="text-text-secondary leading-relaxed mb-4">
                 Francilienne Energy, c&apos;est avant tout, des produits de qualité, avec un savoir-faire
                 reconnu pour l&apos;ensemble de nos solutions. Mais aussi, une équipe de professionnels
                 soucieux de répondre aux exigences du marché français.
               </p>
               <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                <ShieldIcon />
                 Qualité · Réactivité · Proximité
               </div>
             </div>
@@ -430,13 +443,13 @@ function CategoryCard({
   description,
   color,
   href,
-  icon,
+  iconSrc,
 }: {
   title: string;
   description: string;
   color: string;
   href: string;
-  icon: React.ReactNode;
+  iconSrc: string;
 }) {
   return (
     <Link
@@ -445,9 +458,9 @@ function CategoryCard({
     >
       <div
         className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 mx-auto"
-        style={{ backgroundColor: `${color}15` }}
+        style={{ backgroundColor: color }}
       >
-        <div style={{ color }}>{icon}</div>
+        <Image src={iconSrc} alt="" width={24} height={24} />
       </div>
       <h3 className="text-sm font-bold text-text-primary mb-1">{title}</h3>
       <p className="text-xs text-text-secondary leading-relaxed mb-3">{description}</p>
@@ -464,53 +477,4 @@ function CategoryCard({
   );
 }
 
-/* ===== SVG Icons ===== */
-function SolarIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-    </svg>
-  );
-}
-function InverterIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-    </svg>
-  );
-}
-function MicroInverterIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z" />
-    </svg>
-  );
-}
-function StructureIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-    </svg>
-  );
-}
-function BatteryIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 10.5h.375c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125H21M3.75 18h15A2.25 2.25 0 0021 15.75v-6a2.25 2.25 0 00-2.25-2.25h-15A2.25 2.25 0 001.5 9.75v6A2.25 2.25 0 003.75 18z" />
-    </svg>
-  );
-}
-function HeatIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
-    </svg>
-  );
-}
-function ShieldIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-    </svg>
-  );
-}
+

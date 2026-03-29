@@ -10,11 +10,11 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Image
-              src="/logo.png"
+              src="/logo-blanc.svg"
               alt="Francilienne Energy"
-              width={150}
-              height={40}
-              style={{ width: 'auto', height: '40px' }}
+              width={170}
+              height={44}
+              style={{ width: 'auto', height: '44px' }}
             />
           </div>
           <p className="text-white/60 text-sm leading-relaxed">
