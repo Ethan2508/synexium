@@ -2,7 +2,6 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import HeroCarousel from "@/components/home/HeroCarousel";
-import PromoBanners from "@/components/home/PromoBanners";
 
 export const revalidate = 60;
 
@@ -38,9 +37,6 @@ export default async function Home() {
     <>
       {/* ── Hero Carrousel ── */}
       <HeroCarousel />
-
-      {/* ── Bannières promo ── */}
-      <PromoBanners />
 
       {/* ── Produits du moment ── */}
       <section className="bg-white py-16 lg:py-20">

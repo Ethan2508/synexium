@@ -5,9 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SLIDES = [
-  { image: "/hero/hero-panneaux.png", alt: "Installation panneaux solaires surimposition" },
-  { image: "/hero/hero-carport.png", alt: "Carport solaire avec véhicule électrique" },
-  { image: "/hero/hero-install.png", alt: "Maison équipée panneaux solaires" },
+  { image: "/promos/bestseller-hibattery.png", alt: "Best Seller – HiBattery AC Hoymiles", href: "/catalogue?search=hibattery" },
+  { image: "/promos/bestseller-solplanet.png", alt: "Best Seller – Solplanet onduleurs", href: "/catalogue?family=SOLPLANET" },
+  { image: "/promos/promo-iq8.png", alt: "Promo – Série IQ8 Enphase micro-onduleurs", href: "/catalogue?family=ENPHASE" },
 ];
 
 export default function HeroCarousel() {
@@ -63,7 +63,7 @@ export default function HeroCarousel() {
             onMouseLeave={() => setPaused(false)}
           >
             {/* Image principale */}
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl bg-white/5">
+            <Link href={SLIDES[current].href} className="block relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl bg-white/5">
               {SLIDES.map((slide, i) => (
                 <div
                   key={i}
@@ -81,10 +81,7 @@ export default function HeroCarousel() {
                   />
                 </div>
               ))}
-
-              {/* Overlay dégradé bas */}
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/30 to-transparent" />
-            </div>
+            </Link>
 
             {/* Dots */}
             <div className="flex justify-center gap-2 mt-4">
